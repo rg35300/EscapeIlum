@@ -1,0 +1,208 @@
+const express = require("express");
+const http = require("http");
+const cors = require("cors");
+const { Server } = require("socket.io");
+
+const SessionManager = require("./SessionManager");
+const EVENTS = require("./events");
+
+
+const app = express();
+
+app.use(cors());
+
+
+const server = http.createServer(app);
+
+
+const io = new Server(server,{
+
+    cors:{
+        origin:"*"
+    }
+
+});
+
+
+const sessions = new SessionManager();
+
+
+
+io.on("connection",(socket)=>{
+
+
+    console.log(
+        "Connexion :",
+        socket.id
+    );
+
+
+
+    // CREER UNE SESSION
+
+    socket.on(
+        EVENTS.CREATE_SESSION,
+        (data)=>{
+
+
+            const session =
+            sessions.createSession(
+                data.map
+            );
+
+
+            const player = {
+
+                id:socket.id,
+
+                name:data.name || "Player",
+
+                x:5,
+
+                y:5
+
+            };
+
+
+            session.players.push(player);
+
+
+
+            socket.join(
+                session.id
+            );
+
+
+
+            socket.emit(
+                EVENTS.SESSION_CREATED,
+                session
+            );
+
+
+
+            console.log(
+                "Session créée :",
+                session.id
+            );
+
+
+            console.log(
+                "Joueur :",
+                player.name
+            );
+
+
+        }
+    );
+
+
+
+
+    // REJOINDRE UNE SESSION
+
+    socket.on(
+        EVENTS.JOIN_SESSION,
+        (data)=>{
+
+
+            const player = {
+
+                id:socket.id,
+
+                name:data.name || "Player",
+
+                x:5,
+
+                y:5
+
+            };
+
+
+
+            const session =
+            sessions.joinSession(
+                data.sessionId,
+                player
+            );
+
+
+
+            if(!session){
+
+
+                socket.emit(
+                    "join_error",
+                    "Code invalide"
+                );
+
+
+                return;
+
+            }
+
+
+
+            socket.join(
+                session.id
+            );
+
+
+
+            socket.emit(
+                EVENTS.SESSION_JOINED,
+                session
+            );
+
+
+
+            io.to(session.id).emit(
+                EVENTS.PLAYERS_UPDATED,
+                session.players
+            );
+
+
+
+            console.log(
+                player.name,
+                "a rejoint",
+                session.id
+            );
+
+
+        }
+    );
+
+
+
+
+    socket.on(
+        "disconnect",
+        ()=>{
+
+
+            console.log(
+                "Déconnexion :",
+                socket.id
+            );
+
+
+        }
+    );
+
+
+});
+
+
+
+const PORT = process.env.PORT || 3000;
+
+
+server.listen(PORT,"0.0.0.0",()=>{
+
+    console.log(
+        "Serveur EscapeIlum lancé sur le port",
+        PORT
+    );
+
+});
