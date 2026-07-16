@@ -19,9 +19,7 @@ class SocketManager {
     }
 
 
-    this.socket = io(
-        "http://localhost:3000"
-    );
+    this.socket = io("https://escapeilum.onrender.com/");
 
 
     this.socket.on(
