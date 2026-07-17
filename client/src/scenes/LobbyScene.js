@@ -1,3 +1,6 @@
+import SocketManager from "../network/SocketManager.js";
+
+
 export default class LobbyScene extends Phaser.Scene {
 
 
@@ -13,7 +16,15 @@ export default class LobbyScene extends Phaser.Scene {
 
         this.session = data.session;
 
+        this.chatTexts = [];
+
+        this.playerObjects = [];
+
+        this.avatarTextures = [];
+
     }
+
+
 
 
 
@@ -21,11 +32,10 @@ export default class LobbyScene extends Phaser.Scene {
 
 
         const width = this.scale.width;
+
         const height = this.scale.height;
 
 
-
-        // TITRE
 
         this.add.text(
             width / 2,
@@ -41,7 +51,6 @@ export default class LobbyScene extends Phaser.Scene {
 
 
 
-        // CODE SESSION
 
         this.add.text(
             width / 2,
@@ -58,7 +67,7 @@ export default class LobbyScene extends Phaser.Scene {
 
 
 
-        // ZONE JOUEURS
+
 
         this.add.text(
             width * 0.25,
@@ -73,38 +82,15 @@ export default class LobbyScene extends Phaser.Scene {
 
 
 
-        let y = height * 0.40;
 
 
-
-        this.session.players.forEach(
-            (player)=>{
-
-
-                this.add.text(
-                    width * 0.25,
-                    y,
-                    "🟢 " + player.name,
-                    {
-                        fontSize:"28px",
-                        color:"#ffffff"
-                    }
-                )
-                .setOrigin(0.5);
-
-
-
-                y += 45;
-
-
-            }
-        );
+        this.displayPlayers();
 
 
 
 
 
-        // ZONE CHAT (PLACEHOLDER)
+
 
         this.add.text(
             width * 0.75,
@@ -119,16 +105,12 @@ export default class LobbyScene extends Phaser.Scene {
 
 
 
-        this.add.text(
-            width * 0.75,
-            height * 0.45,
-            "Chat coming soon...",
-            {
-                fontSize:"22px",
-                color:"#aaaaaa"
-            }
-        )
-        .setOrigin(0.5);
+
+
+
+        this.createChatHTML();
+
+        this.createAvatarHTML();
 
 
 
@@ -136,35 +118,16 @@ export default class LobbyScene extends Phaser.Scene {
 
 
 
-        // BOUTON START
-
-        const startButton =
-        this.add.text(
-            width / 2,
-            height * 0.85,
-            "START",
-            {
-                fontSize:"36px",
-                color:"#ffff00",
-                backgroundColor:"#222222",
-                padding:{
-                    x:20,
-                    y:10
-                }
-            }
-        )
-        .setOrigin(0.5)
-        .setInteractive();
+        SocketManager.onChatMessage(
+            (data)=>{
 
 
-
-        startButton.on(
-            "pointerdown",
-            ()=>{
-
-                console.log(
-                    "Lancement partie"
+                this.addChatMessage(
+                    data.player +
+                    " : " +
+                    data.message
                 );
+
 
             }
         );
@@ -173,21 +136,481 @@ export default class LobbyScene extends Phaser.Scene {
 
 
 
-        // ADAPTATION AU REDIMENSIONNEMENT
 
-        this.scale.on(
-            "resize",
-            ()=>{
+        SocketManager.onPlayersUpdated(
+            (players)=>{
 
-                this.scene.restart({
-                    session:this.session
-                });
+
+                this.session.players =
+                players;
+
+
+                this.displayPlayers();
+
+
+            }
+        );
+
+
+
+    }
+
+
+
+
+
+
+
+
+
+    displayPlayers(){
+
+
+
+        this.playerObjects.forEach(
+            obj=>obj.destroy()
+        );
+
+
+
+        this.playerObjects=[];
+
+
+
+        let y =
+        this.scale.height * 0.40;
+
+
+
+
+
+
+        this.session.players.forEach(
+            (player)=>{
+
+
+
+                this.createPlayerAvatar(
+                    player,
+                    this.scale.width * 0.12,
+                    y
+                );
+
+
+
+
+                const name =
+                this.add.text(
+                    this.scale.width * 0.25,
+                    y,
+                    player.name,
+                    {
+                        fontSize:"28px",
+                        color:"#ffffff"
+                    }
+                )
+                .setOrigin(0.5);
+
+
+
+                this.playerObjects.push(
+                    name
+                );
+
+
+
+                y += 60;
+
 
             }
         );
 
 
     }
+
+
+
+
+
+
+
+
+
+    createPlayerAvatar(player,x,y){
+
+
+
+        if(player.avatar){
+
+
+
+            const key =
+            "avatar_" + player.id;
+
+
+
+
+
+            if(!this.textures.exists(key)){
+
+
+                this.textures.addBase64(
+                    key,
+                    player.avatar
+                );
+
+
+            }
+
+
+
+
+
+            const image =
+            this.add.image(
+                x,
+                y,
+                key
+            );
+
+
+
+            image.setDisplaySize(
+                50,
+                50
+            );
+
+
+
+
+
+
+            const maskShape =
+            this.make.graphics();
+
+
+
+            maskShape.fillCircle(
+                x,
+                y,
+                25
+            );
+
+
+
+            image.setMask(
+                maskShape.createGeometryMask()
+            );
+
+
+
+            this.playerObjects.push(
+                image
+            );
+
+
+
+        }
+        else{
+
+
+
+            const circle =
+            this.add.circle(
+                x,
+                y,
+                25,
+                0x555555
+            );
+
+
+
+            this.playerObjects.push(
+                circle
+            );
+
+
+        }
+
+
+    }
+
+
+
+
+
+
+
+
+
+    createChatHTML(){
+
+
+
+        const input =
+        document.createElement("input");
+
+        input.placeholder =
+        "Message...";
+
+        input.style.position =
+        "absolute";
+
+        input.style.left =
+        "65%";
+
+        input.style.top =
+        "70%";
+
+        input.style.width =
+        "300px";
+
+        input.style.height =
+        "40px";
+
+
+        document.body.appendChild(
+            input
+        );
+
+
+
+
+
+        const button =
+        document.createElement("button");
+
+
+        button.innerText =
+        "Envoyer";
+
+
+        button.style.position =
+        "absolute";
+
+
+        button.style.left =
+        "65%";
+
+
+        button.style.top =
+        "77%";
+
+
+
+        document.body.appendChild(
+            button
+        );
+
+
+
+
+
+
+
+        button.onclick =
+        ()=>{
+
+
+            if(input.value.trim()==="")
+                return;
+
+
+
+
+            SocketManager.sendChatMessage({
+
+                sessionId:this.session.id,
+
+                player:
+                SocketManager.player.name,
+
+                message:
+                input.value
+
+            });
+
+
+
+            input.value="";
+
+
+        };
+
+
+
+        this.chatInput=input;
+
+        this.chatButton=button;
+
+
+    }
+
+
+
+
+
+
+
+
+
+    addChatMessage(message){
+
+
+
+        const text =
+        this.add.text(
+            this.scale.width * 0.75,
+            this.scale.height * 0.40 +
+            this.chatTexts.length * 30,
+            message,
+            {
+                fontSize:"20px",
+                color:"#ffffff"
+            }
+        );
+
+
+
+        this.chatTexts.push(
+            text
+        );
+
+
+    }
+
+
+
+
+
+
+
+
+
+    createAvatarHTML(){
+
+
+
+        const fileInput =
+        document.createElement("input");
+
+
+
+        fileInput.type =
+        "file";
+
+
+
+        fileInput.accept =
+        "image/*";
+
+
+
+        fileInput.style.position =
+        "absolute";
+
+
+
+        fileInput.style.left =
+        "65%";
+
+
+
+        fileInput.style.top =
+        "82%";
+
+
+
+        document.body.appendChild(
+            fileInput
+        );
+
+
+
+
+
+
+        fileInput.onchange =
+        ()=>{
+
+
+            const file =
+            fileInput.files[0];
+
+
+
+            if(!file)
+                return;
+
+
+
+
+            const reader =
+            new FileReader();
+
+
+
+
+
+            reader.onload =
+            ()=>{
+
+
+                SocketManager.sendAvatar({
+
+                    sessionId:this.session.id,
+
+                    avatar:reader.result
+
+                });
+
+
+            };
+
+
+
+
+
+            reader.readAsDataURL(file);
+
+
+
+        };
+
+
+
+        this.avatarInput=fileInput;
+
+
+    }
+
+
+
+
+
+
+
+
+    shutdown(){
+
+
+
+        if(this.chatInput)
+            this.chatInput.remove();
+
+
+
+        if(this.chatButton)
+            this.chatButton.remove();
+
+
+
+        if(this.avatarInput)
+            this.avatarInput.remove();
+
+
+    }
+
 
 
 }

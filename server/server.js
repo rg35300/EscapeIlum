@@ -28,6 +28,8 @@ const sessions = new SessionManager();
 
 
 
+
+
 io.on("connection",(socket)=>{
 
 
@@ -38,7 +40,14 @@ io.on("connection",(socket)=>{
 
 
 
+
+
+
+
+    // =====================
     // CREER UNE SESSION
+    // =====================
+
 
     socket.on(
         EVENTS.CREATE_SESSION,
@@ -51,26 +60,42 @@ io.on("connection",(socket)=>{
             );
 
 
+
             const player = {
+
 
                 id:socket.id,
 
+
                 name:data.name || "Player",
+
+
+                avatar:null,
+
 
                 x:5,
 
+
                 y:5
+
 
             };
 
 
-            session.players.push(player);
+
+            session.players.push(
+                player
+            );
+
+
 
 
 
             socket.join(
                 session.id
             );
+
+
 
 
 
@@ -81,10 +106,13 @@ io.on("connection",(socket)=>{
 
 
 
+
+
             console.log(
                 "Session créée :",
                 session.id
             );
+
 
 
             console.log(
@@ -93,13 +121,22 @@ io.on("connection",(socket)=>{
             );
 
 
+
         }
     );
 
 
 
 
-    // REJOINDRE UNE SESSION
+
+
+
+
+
+    // =====================
+    // REJOINDRE SESSION
+    // =====================
+
 
     socket.on(
         EVENTS.JOIN_SESSION,
@@ -108,15 +145,27 @@ io.on("connection",(socket)=>{
 
             const player = {
 
+
+
                 id:socket.id,
+
 
                 name:data.name || "Player",
 
+
+                avatar:null,
+
+
                 x:5,
+
 
                 y:5
 
+
+
             };
+
+
 
 
 
@@ -128,7 +177,10 @@ io.on("connection",(socket)=>{
 
 
 
+
+
             if(!session){
+
 
 
                 socket.emit(
@@ -137,15 +189,25 @@ io.on("connection",(socket)=>{
                 );
 
 
+
                 return;
 
+
             }
+
+
+
+
 
 
 
             socket.join(
                 session.id
             );
+
+
+
+
 
 
 
@@ -156,10 +218,19 @@ io.on("connection",(socket)=>{
 
 
 
+
+
+
+
             io.to(session.id).emit(
                 EVENTS.PLAYERS_UPDATED,
                 session.players
             );
+
+
+
+
+
 
 
 
@@ -170,15 +241,150 @@ io.on("connection",(socket)=>{
             );
 
 
+
         }
     );
 
 
 
 
+
+
+
+
+
+    // =====================
+    // CHAT
+    // =====================
+
+
+    socket.on(
+        EVENTS.CHAT_MESSAGE,
+        (data)=>{
+
+
+
+            io.to(data.sessionId).emit(
+                EVENTS.CHAT_MESSAGE,
+                {
+
+
+                    player:data.player,
+
+
+                    message:data.message
+
+
+
+                }
+            );
+
+
+
+        }
+    );
+
+
+
+
+
+
+
+
+
+    // =====================
+    // AVATAR
+    // =====================
+
+
+    socket.on(
+        EVENTS.AVATAR_UPDATE,
+        (data)=>{
+
+
+
+
+
+            const session =
+            sessions.getSession(
+                data.sessionId
+            );
+
+
+
+
+
+            if(!session){
+
+                return;
+
+            }
+
+
+
+
+
+
+
+            const player =
+            session.players.find(
+                p=>p.id === socket.id
+            );
+
+
+
+
+
+            if(!player){
+
+                return;
+
+            }
+
+
+
+
+
+
+
+            player.avatar =
+            data.avatar;
+
+
+
+
+
+
+
+
+            io.to(session.id).emit(
+                EVENTS.PLAYERS_UPDATED,
+                session.players
+            );
+
+
+
+
+        }
+    );
+
+
+
+
+
+
+
+
+
+    // =====================
+    // DECONNEXION
+    // =====================
+
+
     socket.on(
         "disconnect",
         ()=>{
+
 
 
             console.log(
@@ -187,22 +393,38 @@ io.on("connection",(socket)=>{
             );
 
 
+
         }
     );
 
 
-});
-
-
-
-const PORT = process.env.PORT || 3000;
-
-
-server.listen(PORT,"0.0.0.0",()=>{
-
-    console.log(
-        "Serveur EscapeIlum lancé sur le port",
-        PORT
-    );
 
 });
+
+
+
+
+
+
+
+
+
+const PORT =
+process.env.PORT || 3000;
+
+
+
+server.listen(
+    PORT,
+    "0.0.0.0",
+    ()=>{
+
+
+        console.log(
+            "Serveur EscapeIlum lancé sur le port",
+            PORT
+        );
+
+
+    }
+);

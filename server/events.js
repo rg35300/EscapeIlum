@@ -19,7 +19,13 @@ const EVENTS = {
     START_GAME: "start_game",
 
 
-    GAME_STARTED: "game_started"
+    GAME_STARTED: "game_started",
+
+
+    CHAT_MESSAGE: "chat_message",
+
+
+    AVATAR_UPDATE: "avatar_update"
 
 
 };

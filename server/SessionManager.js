@@ -9,6 +9,7 @@ class SessionManager {
 
 
 
+
     createSession(map){
 
 
@@ -37,11 +38,17 @@ class SessionManager {
 
 
 
+
+
     getSession(id){
+
 
         return this.sessions[id];
 
+
     }
+
+
 
 
 
@@ -52,6 +59,7 @@ class SessionManager {
         this.sessions[id];
 
 
+
         if(!session){
 
             return null;
@@ -59,7 +67,9 @@ class SessionManager {
         }
 
 
+
         session.players.push(player);
+
 
 
         return session;
