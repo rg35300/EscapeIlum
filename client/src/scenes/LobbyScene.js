@@ -159,21 +159,34 @@ export default class LobbyScene extends Phaser.Scene {
 
 
                 const avatar =
-                this.add.image(
-                    -120,
-                    y,
-                    player.avatar || "SAMOYED_1"
-                );
+this.add.image(
+    -120,
+    y,
+    player.avatar || "SAMOYED_1"
+);
+
+
+avatar.setDisplaySize(
+    60,
+    60
+);
 
 
 
-                avatar.setDisplaySize(
-                    60,
-                    60
-                );
+const mask =
+this.make.graphics();
 
 
-                avatar.setCircleCrop();
+mask.fillCircle(
+    -120,
+    y,
+    30
+);
+
+
+avatar.setMask(
+    mask.createGeometryMask()
+);
 
 
 

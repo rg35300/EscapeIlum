@@ -13,24 +13,25 @@ export default class MenuScene extends Phaser.Scene {
 
 
 
+
     create(){
 
 
         this.selectedAvatar = "SAMOYED_1";
 
 
-
-        const centerX =
-        this.scale.width / 2;
-
+        const width =
+        this.scale.width;
 
 
+        const height =
+        this.scale.height;
 
 
 
         this.add.text(
-            centerX,
-            50,
+            width / 2,
+            60,
             "ESCAPE ILUM FACTORY",
             {
                 fontSize:"48px",
@@ -45,7 +46,143 @@ export default class MenuScene extends Phaser.Scene {
 
 
 
+        // TITRE AVATAR
 
+        this.add.text(
+            width / 2,
+            260,
+            "Choose your avatar",
+            {
+                fontSize:"28px",
+                color:"#ffffff"
+            }
+        )
+        .setOrigin(0.5);
+
+
+
+
+
+
+
+
+        this.avatarImages = [];
+
+
+
+        const avatars = [
+
+            "SAMOYED_1",
+            "SAMOYED_2",
+            "SAMOYED_3",
+            "SAMOYED_4",
+            "SAMOYED_5",
+            "SAMOYED_6",
+            "SAMOYED_7"
+
+        ];
+
+
+
+
+
+
+        let startX =
+        width / 2 - 210;
+
+
+        let y =
+        340;
+
+
+
+
+
+
+        avatars.forEach(
+            (avatar,index)=>{
+
+
+                const img =
+                this.add.image(
+                    startX + index * 70,
+                    y,
+                    avatar
+                );
+
+
+
+                img.setDisplaySize(
+                    60,
+                    60
+                );
+
+
+
+                img.setInteractive();
+
+
+
+                img.setMask(
+                    this.createCircleMask(
+                        startX + index * 70,
+                        y,
+                        30
+                    )
+                );
+
+
+
+                img.on(
+                    "pointerdown",
+                    ()=>{
+
+
+                        this.selectedAvatar =
+                        avatar;
+
+
+
+                        this.updateAvatarSelection(
+                            avatar
+                        );
+
+
+                    }
+                );
+
+
+
+                this.avatarImages.push({
+
+                    name:avatar,
+
+                    image:img
+
+
+                });
+
+
+            }
+        );
+
+
+
+
+
+        this.updateAvatarSelection(
+            "SAMOYED_1"
+        );
+
+
+
+
+
+
+
+
+
+        // MENU HTML
 
         const container =
         document.createElement("div");
@@ -61,11 +198,11 @@ export default class MenuScene extends Phaser.Scene {
 
 
         container.style.top =
-        "45%";
+        "150px";
 
 
         container.style.transform =
-        "translate(-50%, -50%)";
+        "translateX(-50%)";
 
 
         container.style.display =
@@ -89,33 +226,6 @@ export default class MenuScene extends Phaser.Scene {
             container
         );
 
-
-
-
-
-
-
-
-
-        const nameLabel =
-        document.createElement("div");
-
-
-        nameLabel.innerText =
-        "Player name";
-
-
-        nameLabel.style.color =
-        "white";
-
-
-        nameLabel.style.fontSize =
-        "24px";
-
-
-        container.appendChild(
-            nameLabel
-        );
 
 
 
@@ -148,190 +258,9 @@ export default class MenuScene extends Phaser.Scene {
 
 
 
-
-        const avatarTitle =
-        document.createElement("div");
-
-
-        avatarTitle.innerText =
-        "Choose your avatar";
-
-
-        avatarTitle.style.color =
-        "white";
-
-
-        avatarTitle.style.fontSize =
-        "24px";
-
-
-        container.appendChild(
-            avatarTitle
-        );
-
-
-
-
-
-
-
-
-        const avatarContainer =
-        document.createElement("div");
-
-
-
-        avatarContainer.style.display =
-        "flex";
-
-
-        avatarContainer.style.gap =
-        "10px";
-
-
-        avatarContainer.style.flexWrap =
-        "wrap";
-
-
-        avatarContainer.style.width =
-        "350px";
-
-
-        avatarContainer.style.justifyContent =
-        "center";
-
-
-
-        container.appendChild(
-            avatarContainer
-        );
-
-
-
-
-
-
-
-
-        const avatars = [
-
-            "SAMOYED_1",
-            "SAMOYED_2",
-            "SAMOYED_3",
-            "SAMOYED_4",
-            "SAMOYED_5",
-            "SAMOYED_6",
-            "SAMOYED_7"
-
-        ];
-
-
-
-
-
-
-
-        avatars.forEach(
-            (avatar)=>{
-
-
-                const img =
-                document.createElement("img");
-
-
-
-                img.src =
-                this.textures
-                .get(avatar)
-                .getSourceImage()
-                .src;
-
-
-
-                img.style.width =
-                "70px";
-
-
-                img.style.height =
-                "70px";
-
-
-                img.style.objectFit =
-                "cover";
-
-
-                img.style.borderRadius =
-                "50%";
-
-
-                img.style.cursor =
-                "pointer";
-
-
-                img.style.border =
-                avatar === this.selectedAvatar
-                ?
-                "4px solid #00ff00"
-                :
-                "2px solid white";
-
-
-
-
-
-                img.onclick =
-                ()=>{
-
-
-                    this.selectedAvatar =
-                    avatar;
-
-
-
-                    document
-                    .querySelectorAll(
-                        ".avatarChoice"
-                    )
-                    .forEach(
-                        el=>
-                        el.style.border =
-                        "2px solid white"
-                    );
-
-
-
-                    img.style.border =
-                    "4px solid #00ff00";
-
-
-                };
-
-
-
-                img.className =
-                "avatarChoice";
-
-
-
-                avatarContainer.appendChild(
-                    img
-                );
-
-
-            }
-        );
-
-
-
-
-
-
-
-
-
         const hostButton =
         this.createHTMLButton(
-            "Host",
+            "HOST",
             "#00ff00"
         );
 
@@ -352,7 +281,7 @@ export default class MenuScene extends Phaser.Scene {
 
 
         codeInput.placeholder =
-        "Lobby code";
+        "Lobby Code";
 
 
         this.styleInput(
@@ -373,7 +302,7 @@ export default class MenuScene extends Phaser.Scene {
 
         const joinButton =
         this.createHTMLButton(
-            "Join",
+            "JOIN",
             "#00ffff"
         );
 
@@ -381,7 +310,6 @@ export default class MenuScene extends Phaser.Scene {
         container.appendChild(
             joinButton
         );
-
 
 
 
@@ -403,7 +331,6 @@ export default class MenuScene extends Phaser.Scene {
 
 
                     container.remove();
-
 
 
                     this.scene.start(
@@ -455,7 +382,6 @@ export default class MenuScene extends Phaser.Scene {
                     container.remove();
 
 
-
                     this.scene.start(
                         "LobbyScene",
                         {
@@ -475,12 +401,10 @@ export default class MenuScene extends Phaser.Scene {
                 codeInput.value.toUpperCase(),
 
 
-                name:
-                nameInput.value,
+                name:nameInput.value,
 
 
-                avatar:
-                this.selectedAvatar
+                avatar:this.selectedAvatar
 
 
             });
@@ -488,6 +412,83 @@ export default class MenuScene extends Phaser.Scene {
 
         };
 
+
+
+
+    }
+
+
+
+
+
+
+
+
+
+    createCircleMask(x,y,radius){
+
+
+        const graphics =
+        this.make.graphics();
+
+
+        graphics.fillStyle(
+            0xffffff
+        );
+
+
+        graphics.fillCircle(
+            x,
+            y,
+            radius
+        );
+
+
+        return graphics.createGeometryMask();
+
+
+    }
+
+
+
+
+
+
+
+
+
+    updateAvatarSelection(selected){
+
+
+
+        this.avatarImages.forEach(
+            (data)=>{
+
+
+                if(
+                    data.name === selected
+                ){
+
+
+                    data.image.setScale(
+                        0.9
+                    );
+
+
+                }
+                else{
+
+
+                    data.image.setScale(
+                        0.7
+                    );
+
+
+                }
+
+
+            }
+        );
 
 
     }
@@ -528,7 +529,6 @@ export default class MenuScene extends Phaser.Scene {
 
 
 
-
     createHTMLButton(text,color){
 
 
@@ -536,8 +536,10 @@ export default class MenuScene extends Phaser.Scene {
         document.createElement("button");
 
 
+
         button.innerText =
         text;
+
 
 
         button.style.width =
@@ -564,6 +566,7 @@ export default class MenuScene extends Phaser.Scene {
         "pointer";
 
 
+
         return button;
 
 
@@ -572,19 +575,6 @@ export default class MenuScene extends Phaser.Scene {
 
 
 
-    shutdown(){
-
-
-        document
-        .querySelectorAll(
-            "body > div"
-        )
-        .forEach(
-            el=>el.remove()
-        );
-
-
-    }
 
 
 }
