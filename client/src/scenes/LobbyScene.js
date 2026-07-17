@@ -387,13 +387,9 @@ export default class LobbyScene extends Phaser.Scene {
 
 
 
-        input.style.left =
-        "62%";
+        input.style.left = "calc(50% + 180px)";
+        input.style.top = "540px";
 
-
-
-        input.style.top =
-        "570px";
 
 
 
@@ -447,13 +443,8 @@ export default class LobbyScene extends Phaser.Scene {
 
 
 
-        button.style.left =
-        "82%";
-
-
-
-        button.style.top =
-        "570px";
+        button.style.left = "calc(50% + 470px)";
+button.style.top = "540px";
 
 
 
