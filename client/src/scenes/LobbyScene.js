@@ -41,8 +41,6 @@ export default class LobbyScene extends Phaser.Scene {
 
 
 
-        // TITRE
-
 
         this.add.text(
             width / 2,
@@ -59,8 +57,6 @@ export default class LobbyScene extends Phaser.Scene {
 
 
 
-
-        // CODE SESSION
 
 
         this.add.text(
@@ -80,8 +76,6 @@ export default class LobbyScene extends Phaser.Scene {
 
 
 
-        // JOUEURS
-
 
         this.add.text(
             width * 0.25,
@@ -97,6 +91,7 @@ export default class LobbyScene extends Phaser.Scene {
 
 
 
+
         this.displayPlayers();
 
 
@@ -104,9 +99,6 @@ export default class LobbyScene extends Phaser.Scene {
 
 
 
-
-
-        // CHAT TITRE
 
 
         this.add.text(
@@ -124,6 +116,8 @@ export default class LobbyScene extends Phaser.Scene {
 
 
 
+
+
         this.createChatHTML();
 
 
@@ -133,9 +127,6 @@ export default class LobbyScene extends Phaser.Scene {
 
 
 
-
-
-        // RECEPTION CHAT
 
 
         SocketManager.onChatMessage(
@@ -157,9 +148,6 @@ export default class LobbyScene extends Phaser.Scene {
 
 
 
-
-
-        // UPDATE JOUEURS
 
 
         SocketManager.onPlayersUpdated(
@@ -199,7 +187,7 @@ export default class LobbyScene extends Phaser.Scene {
 
 
 
-        this.playerObjects = [];
+        this.playerObjects=[];
 
 
 
@@ -234,7 +222,6 @@ export default class LobbyScene extends Phaser.Scene {
 
 
 
-
                 const name =
                 this.add.text(
                     this.scale.width * 0.25,
@@ -260,7 +247,6 @@ export default class LobbyScene extends Phaser.Scene {
 
             }
         );
-
 
 
     }
@@ -337,7 +323,6 @@ export default class LobbyScene extends Phaser.Scene {
 
 
 
-
         const messages =
         document.createElement("div");
 
@@ -357,7 +342,6 @@ export default class LobbyScene extends Phaser.Scene {
 
         messages.style.fontSize =
         "18px";
-
 
 
         messages.style.padding =
@@ -410,7 +394,6 @@ export default class LobbyScene extends Phaser.Scene {
         "Message...";
 
 
-
         input.style.flex =
         "1";
 
@@ -450,7 +433,6 @@ export default class LobbyScene extends Phaser.Scene {
 
         button.innerText =
         "Envoyer";
-
 
 
         button.style.height =
@@ -499,7 +481,6 @@ export default class LobbyScene extends Phaser.Scene {
 
 
 
-
             SocketManager.sendChatMessage({
 
                 sessionId:this.session.id,
@@ -545,6 +526,7 @@ export default class LobbyScene extends Phaser.Scene {
 
             }
         );
+
 
 
 
@@ -611,6 +593,75 @@ export default class LobbyScene extends Phaser.Scene {
 
 
 
+        const button =
+        document.createElement("button");
+
+
+
+        button.innerText =
+        "📷 Choisir un avatar";
+
+
+
+        button.style.position =
+        "absolute";
+
+
+        button.style.left =
+        "65%";
+
+
+        button.style.top =
+        "82%";
+
+
+        button.style.width =
+        "350px";
+
+
+        button.style.height =
+        "45px";
+
+
+        button.style.borderRadius =
+        "10px";
+
+
+        button.style.border =
+        "none";
+
+
+        button.style.background =
+        "#00ffff";
+
+
+        button.style.color =
+        "#000";
+
+
+        button.style.fontSize =
+        "22px";
+
+
+        button.style.fontWeight =
+        "bold";
+
+
+        button.style.cursor =
+        "pointer";
+
+
+
+        document.body.appendChild(
+            button
+        );
+
+
+
+
+
+
+
         const fileInput =
         document.createElement("input");
 
@@ -624,23 +675,33 @@ export default class LobbyScene extends Phaser.Scene {
         "image/*";
 
 
-
-        fileInput.style.position =
-        "absolute";
-
-
-        fileInput.style.left =
-        "65%";
-
-
-        fileInput.style.top =
-        "82%";
+        fileInput.style.display =
+        "none";
 
 
 
         document.body.appendChild(
             fileInput
         );
+
+
+
+
+
+
+
+
+        button.onclick =
+        ()=>{
+
+
+            fileInput.click();
+
+
+        };
+
+
+
 
 
 
@@ -657,6 +718,8 @@ export default class LobbyScene extends Phaser.Scene {
 
             if(!file)
                 return;
+
+
 
 
 
@@ -687,6 +750,7 @@ export default class LobbyScene extends Phaser.Scene {
 
 
 
+
             reader.readAsDataURL(
                 file
             );
@@ -694,6 +758,12 @@ export default class LobbyScene extends Phaser.Scene {
 
         };
 
+
+
+
+
+        this.avatarButton =
+        button;
 
 
         this.avatarInput =
@@ -716,6 +786,11 @@ export default class LobbyScene extends Phaser.Scene {
 
         if(this.chatBox)
             this.chatBox.remove();
+
+
+
+        if(this.avatarButton)
+            this.avatarButton.remove();
 
 
 

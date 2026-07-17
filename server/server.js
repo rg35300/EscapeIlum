@@ -382,20 +382,64 @@ io.on("connection",(socket)=>{
 
 
     socket.on(
-        "disconnect",
-        ()=>{
+    "disconnect",
+    ()=>{
+
+
+        console.log(
+            "Déconnexion :",
+            socket.id
+        );
 
 
 
-            console.log(
-                "Déconnexion :",
-                socket.id
+        const result =
+        sessions.removePlayer(
+            socket.id
+        );
+
+
+
+        if(!result){
+
+            return;
+
+        }
+
+
+
+
+        if(result.session){
+
+
+
+            io.to(
+                result.session.id
+            ).emit(
+                EVENTS.PLAYERS_UPDATED,
+                result.session.players
             );
 
 
 
         }
-    );
+
+
+
+        else{
+
+
+            console.log(
+                "Session supprimée"
+            );
+
+
+        }
+
+
+
+    }
+);
 
 
 
