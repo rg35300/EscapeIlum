@@ -9,7 +9,9 @@ const EVENTS = require("./events");
 
 const app = express();
 
+
 app.use(cors());
+
 
 
 const server =
@@ -35,6 +37,8 @@ new SessionManager();
 
 
 
+
+
 io.on(
 "connection",
 (socket)=>{
@@ -45,6 +49,8 @@ io.on(
         "Connexion :",
         socket.id
     );
+
+
 
 
 
@@ -69,6 +75,7 @@ io.on(
 
 
 
+
             const player = {
 
 
@@ -90,6 +97,7 @@ io.on(
 
 
             };
+
 
 
 
@@ -111,6 +119,7 @@ io.on(
 
 
 
+
             socket.emit(
                 EVENTS.SESSION_CREATED,
                 session
@@ -126,8 +135,13 @@ io.on(
             );
 
 
+
         }
     );
+
+
+
+
 
 
 
@@ -143,6 +157,7 @@ io.on(
     socket.on(
         EVENTS.JOIN_SESSION,
         (data)=>{
+
 
 
             const player = {
@@ -171,11 +186,16 @@ io.on(
 
 
 
+
+
+
             const session =
             sessions.joinSession(
                 data.sessionId,
                 player
             );
+
+
 
 
 
@@ -201,9 +221,12 @@ io.on(
 
 
 
+
             socket.join(
                 session.id
             );
+
+
 
 
 
@@ -213,6 +236,8 @@ io.on(
                 EVENTS.SESSION_JOINED,
                 session
             );
+
+
 
 
 
@@ -230,15 +255,143 @@ io.on(
 
 
 
+
+
+            // Envoi historique chat
+
+            socket.emit(
+                EVENTS.CHAT_HISTORY,
+                session.messages
+            );
+
+
+
+
+
+
+
+
             console.log(
+
                 player.name,
                 "a rejoint",
                 session.id
+
             );
+
 
 
         }
     );
+
+
+
+
+
+
+
+
+
+
+
+
+
+    // CHAT
+
+
+    socket.on(
+        EVENTS.CHAT_MESSAGE,
+        (message)=>{
+
+
+
+            const rooms =
+            Array.from(
+                socket.rooms
+            );
+
+
+
+            const sessionId =
+            rooms.find(
+                room=>room !== socket.id
+            );
+
+
+
+
+
+            if(!sessionId)
+                return;
+
+
+
+
+
+
+
+            const player =
+            Object.values(
+                sessions.getSession(sessionId).players
+            )
+            .find(
+                p=>p.id === socket.id
+            );
+
+
+
+
+
+
+
+            const chatMessage = {
+
+
+                name:
+                player
+                ? player.name
+                : "Player",
+
+
+                message:message
+
+
+            };
+
+
+
+
+
+
+
+            sessions.addMessage(
+                sessionId,
+                chatMessage
+            );
+
+
+
+
+
+
+
+
+            io.to(
+                sessionId
+            )
+            .emit(
+                EVENTS.CHAT_MESSAGE,
+                chatMessage
+            );
+
+
+
+        }
+    );
+
+
+
+
 
 
 
@@ -256,10 +409,12 @@ io.on(
         ()=>{
 
 
+
             console.log(
                 "Déconnexion :",
                 socket.id
             );
+
 
 
 
@@ -274,8 +429,12 @@ io.on(
 
 
 
+
+
             if(!result)
                 return;
+
+
 
 
 
@@ -299,8 +458,12 @@ io.on(
 
 
 
+
+
+
         }
     );
+
 
 
 

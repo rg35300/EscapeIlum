@@ -16,7 +16,10 @@ export default class LobbyScene extends Phaser.Scene {
 
         this.session = data.session;
 
+        this.messages = [];
+
     }
+
 
 
 
@@ -29,12 +32,16 @@ export default class LobbyScene extends Phaser.Scene {
         this.scale.width;
 
 
+        const height =
+        this.scale.height;
+
+
 
 
 
         this.add.text(
             width / 2,
-            60,
+            50,
             "LOBBY",
             {
                 fontSize:"50px",
@@ -49,9 +56,10 @@ export default class LobbyScene extends Phaser.Scene {
 
 
 
+
         this.add.text(
             width / 2,
-            130,
+            120,
             "Session code : " + this.session.id,
             {
                 fontSize:"30px",
@@ -66,9 +74,14 @@ export default class LobbyScene extends Phaser.Scene {
 
 
 
+
+
+        // PLAYERS
+
+
         this.add.text(
             width * 0.25,
-            220,
+            200,
             "Players",
             {
                 fontSize:"32px",
@@ -82,14 +95,11 @@ export default class LobbyScene extends Phaser.Scene {
 
 
 
-
         this.playersContainer =
         this.add.container(
             width * 0.25,
-            280
+            260
         );
-
-
 
 
 
@@ -106,9 +116,13 @@ export default class LobbyScene extends Phaser.Scene {
 
 
 
+
+        // CHAT
+
+
         this.add.text(
             width * 0.75,
-            220,
+            200,
             "Chat",
             {
                 fontSize:"32px",
@@ -116,6 +130,50 @@ export default class LobbyScene extends Phaser.Scene {
             }
         )
         .setOrigin(0.5);
+
+
+
+
+
+
+
+        this.add.rectangle(
+            width * 0.75,
+            390,
+            450,
+            300,
+            0x222222
+        );
+
+
+
+
+
+
+
+        this.chatText =
+        this.add.text(
+            width * 0.75 - 200,
+            250,
+            "",
+            {
+                fontSize:"22px",
+                color:"#ffffff",
+                wordWrap:{
+                    width:390
+                }
+            }
+        );
+
+
+
+
+
+
+
+
+        this.createChatInput();
+
 
 
 
@@ -137,7 +195,29 @@ export default class LobbyScene extends Phaser.Scene {
         );
 
 
+
+
+
+
+
+
+
+        SocketManager.onChatMessage(
+            (data)=>{
+
+
+                this.addMessage(
+                    data
+                );
+
+
+            }
+        );
+
+
+
     }
+
 
 
 
@@ -167,6 +247,8 @@ export default class LobbyScene extends Phaser.Scene {
 
 
 
+
+
                 const avatar =
                 this.add.image(
                     -120,
@@ -176,10 +258,14 @@ export default class LobbyScene extends Phaser.Scene {
 
 
 
+
+
                 avatar.setDisplaySize(
-                    64,
-                    64
+                    55,
+                    55
                 );
+
+
 
 
 
@@ -192,7 +278,7 @@ export default class LobbyScene extends Phaser.Scene {
                     y,
                     player.name || "Player",
                     {
-                        fontSize:"28px",
+                        fontSize:"26px",
                         color:"#ffffff"
                     }
                 )
@@ -200,6 +286,7 @@ export default class LobbyScene extends Phaser.Scene {
                     0,
                     0.5
                 );
+
 
 
 
@@ -217,8 +304,7 @@ export default class LobbyScene extends Phaser.Scene {
 
 
 
-                y += 80;
-
+                y += 75;
 
 
             }
@@ -227,6 +313,251 @@ export default class LobbyScene extends Phaser.Scene {
 
     }
 
+
+
+
+
+
+
+
+
+    createChatInput(){
+
+
+
+        const input =
+        document.createElement("input");
+
+
+
+        input.placeholder =
+        "Message...";
+
+
+
+        input.style.position =
+        "absolute";
+
+
+
+        input.style.left =
+        "65%";
+
+
+
+        input.style.top =
+        "650px";
+
+
+
+        input.style.width =
+        "280px";
+
+
+
+        input.style.height =
+        "40px";
+
+
+
+        input.style.fontSize =
+        "20px";
+
+
+
+        document.body.appendChild(
+            input
+        );
+
+
+
+
+
+
+
+
+
+        const button =
+        document.createElement("button");
+
+
+
+        button.innerText =
+        "SEND";
+
+
+
+        button.style.position =
+        "absolute";
+
+
+
+        button.style.left =
+        "82%";
+
+
+
+        button.style.top =
+        "650px";
+
+
+
+        button.style.height =
+        "40px";
+
+
+
+        button.style.fontSize =
+        "20px";
+
+
+
+        document.body.appendChild(
+            button
+        );
+
+
+
+
+
+
+
+        button.onclick =
+        ()=>{
+
+
+            const message =
+            input.value.trim();
+
+
+
+
+            if(message === "")
+                return;
+
+
+
+
+
+            SocketManager.sendChatMessage(
+                message
+            );
+
+
+
+            input.value = "";
+
+
+
+        };
+
+
+
+
+
+
+
+        input.addEventListener(
+            "keydown",
+            (event)=>{
+
+
+                if(
+                    event.key === "Enter"
+                ){
+
+
+                    button.click();
+
+
+                }
+
+
+            }
+        );
+
+
+
+
+
+        this.chatInput =
+        input;
+
+
+        this.chatButton =
+        button;
+
+
+    }
+
+
+
+
+
+
+
+
+
+    addMessage(data){
+
+
+
+        const line =
+        data.name + " : " + data.message;
+
+
+
+        this.messages.push(
+            line
+        );
+
+
+
+
+
+        if(
+            this.messages.length > 10
+        ){
+
+            this.messages.shift();
+
+        }
+
+
+
+
+
+
+
+        this.chatText.setText(
+            this.messages.join("\n")
+        );
+
+
+
+    }
+
+
+
+
+
+
+
+
+    shutdown(){
+
+
+
+        if(this.chatInput)
+            this.chatInput.remove();
+
+
+
+        if(this.chatButton)
+            this.chatButton.remove();
+
+
+    }
 
 
 }

@@ -13,14 +13,28 @@ export default class MenuScene extends Phaser.Scene {
 
 
 
+
+
     create(){
 
 
-        this.selectedAvatar = "SAMOYED_1";
+        this.selectedAvatar =
+        "SAMOYED_1";
+
 
 
         const width =
         this.scale.width;
+
+
+
+        const height =
+        this.scale.height;
+
+
+
+
+
 
 
 
@@ -40,9 +54,11 @@ export default class MenuScene extends Phaser.Scene {
 
 
 
+
+
         this.add.text(
             width / 2,
-            260,
+            250,
             "Choose your avatar",
             {
                 fontSize:"28px",
@@ -57,7 +73,10 @@ export default class MenuScene extends Phaser.Scene {
 
 
 
+
+
         this.avatarImages = [];
+
 
 
 
@@ -79,13 +98,13 @@ export default class MenuScene extends Phaser.Scene {
 
 
 
-        let startX =
-        width / 2 - 270;
+        const startX =
+        width / 2 - 225;
 
 
 
-        let y =
-        340;
+        const y =
+        320;
 
 
 
@@ -100,10 +119,11 @@ export default class MenuScene extends Phaser.Scene {
 
                 const img =
                 this.add.image(
-                    startX + index * 90,
+                    startX + index * 75,
                     y,
                     avatar
                 );
+
 
 
 
@@ -114,13 +134,16 @@ export default class MenuScene extends Phaser.Scene {
 
 
 
+
                 img.setInteractive();
+
 
 
 
                 img.on(
                     "pointerdown",
                     ()=>{
+
 
 
                         this.selectedAvatar =
@@ -135,6 +158,9 @@ export default class MenuScene extends Phaser.Scene {
 
                     }
                 );
+
+
+
 
 
 
@@ -168,7 +194,8 @@ export default class MenuScene extends Phaser.Scene {
 
 
 
-        this.createMenuHTML();
+
+        this.createHTMLMenu();
 
 
     }
@@ -180,7 +207,8 @@ export default class MenuScene extends Phaser.Scene {
 
 
 
-    createMenuHTML(){
+
+    createHTMLMenu(){
 
 
 
@@ -189,8 +217,11 @@ export default class MenuScene extends Phaser.Scene {
 
 
 
-        this.menuContainer =
+        this.htmlContainer =
         container;
+
+
+
 
 
 
@@ -199,38 +230,50 @@ export default class MenuScene extends Phaser.Scene {
         "absolute";
 
 
+
         container.style.left =
         "50%";
 
 
+
         container.style.top =
-        "480px";
+        "380px";
+
 
 
         container.style.transform =
         "translateX(-50%)";
 
 
+
         container.style.display =
         "flex";
+
 
 
         container.style.flexDirection =
         "column";
 
 
+
         container.style.alignItems =
         "center";
 
 
+
         container.style.gap =
-        "15px";
+        "12px";
+
+
 
 
 
         document.body.appendChild(
             container
         );
+
+
+
 
 
 
@@ -264,6 +307,9 @@ export default class MenuScene extends Phaser.Scene {
 
 
 
+
+
+
         const hostButton =
         this.createHTMLButton(
             "HOST",
@@ -275,6 +321,9 @@ export default class MenuScene extends Phaser.Scene {
         container.appendChild(
             hostButton
         );
+
+
+
 
 
 
@@ -308,6 +357,9 @@ export default class MenuScene extends Phaser.Scene {
 
 
 
+
+
+
         const joinButton =
         this.createHTMLButton(
             "JOIN",
@@ -327,11 +379,15 @@ export default class MenuScene extends Phaser.Scene {
 
 
 
+
         hostButton.onclick =
         ()=>{
 
 
+
             SocketManager.connect();
+
+
 
 
 
@@ -339,7 +395,8 @@ export default class MenuScene extends Phaser.Scene {
                 (session)=>{
 
 
-                    container.remove();
+
+                    this.cleanHTML();
 
 
 
@@ -351,8 +408,13 @@ export default class MenuScene extends Phaser.Scene {
                     );
 
 
+
                 }
             );
+
+
+
+
 
 
 
@@ -377,11 +439,17 @@ export default class MenuScene extends Phaser.Scene {
 
 
 
+
         joinButton.onclick =
         ()=>{
 
 
+
             SocketManager.connect();
+
+
+
+
 
 
 
@@ -389,7 +457,8 @@ export default class MenuScene extends Phaser.Scene {
                 (session)=>{
 
 
-                    container.remove();
+
+                    this.cleanHTML();
 
 
 
@@ -401,8 +470,14 @@ export default class MenuScene extends Phaser.Scene {
                     );
 
 
+
                 }
             );
+
+
+
+
+
 
 
 
@@ -417,11 +492,14 @@ export default class MenuScene extends Phaser.Scene {
 
                 avatar:this.selectedAvatar
 
+
             });
 
 
 
         };
+
+
 
 
     }
@@ -443,7 +521,9 @@ export default class MenuScene extends Phaser.Scene {
 
 
 
-                if(data.name === selected){
+                if(
+                    data.name === selected
+                ){
 
 
 
@@ -462,7 +542,6 @@ export default class MenuScene extends Phaser.Scene {
 
                 }
                 else{
-
 
 
                     data.image.setDisplaySize(
@@ -486,6 +565,7 @@ export default class MenuScene extends Phaser.Scene {
         );
 
 
+
     }
 
 
@@ -506,12 +586,12 @@ export default class MenuScene extends Phaser.Scene {
 
 
         input.style.height =
-        "45px";
+        "40px";
 
 
 
         input.style.fontSize =
-        "24px";
+        "22px";
 
 
 
@@ -544,18 +624,20 @@ export default class MenuScene extends Phaser.Scene {
 
 
 
+
+
         button.style.width =
         "300px";
 
 
 
         button.style.height =
-        "50px";
+        "45px";
 
 
 
         button.style.fontSize =
-        "28px";
+        "26px";
 
 
 
@@ -575,6 +657,44 @@ export default class MenuScene extends Phaser.Scene {
 
 
         return button;
+
+
+    }
+
+
+
+
+
+
+
+
+
+    cleanHTML(){
+
+
+
+        if(
+            this.htmlContainer
+        ){
+
+
+            this.htmlContainer.remove();
+
+
+        }
+
+
+    }
+
+
+
+
+
+
+    shutdown(){
+
+
+        this.cleanHTML();
 
 
     }

@@ -12,6 +12,7 @@ class SessionManager {
 
 
 
+
     createSession(map){
 
 
@@ -20,6 +21,7 @@ class SessionManager {
         .toString(36)
         .substring(2,8)
         .toUpperCase();
+
 
 
 
@@ -33,10 +35,15 @@ class SessionManager {
             map:map,
 
 
-            players:[]
+            players:[],
+
+
+            messages:[]
 
 
         };
+
+
 
 
 
@@ -44,6 +51,8 @@ class SessionManager {
 
 
     }
+
+
 
 
 
@@ -58,6 +67,7 @@ class SessionManager {
 
 
     }
+
 
 
 
@@ -85,6 +95,8 @@ class SessionManager {
 
 
 
+
+
         session.players.push(
             player
         );
@@ -95,6 +107,61 @@ class SessionManager {
 
 
     }
+
+
+
+
+
+
+
+
+
+    addMessage(id,message){
+
+
+
+        const session =
+        this.sessions[id];
+
+
+
+        if(!session){
+
+            return null;
+
+        }
+
+
+
+
+
+        session.messages.push(
+            message
+        );
+
+
+
+
+
+        // limite historique
+
+        if(session.messages.length > 50){
+
+
+            session.messages.shift();
+
+
+        }
+
+
+
+
+
+        return session.messages;
+
+
+    }
+
 
 
 
@@ -138,6 +205,8 @@ class SessionManager {
 
 
 
+
+
                 session.players.splice(
                     index,
                     1
@@ -147,8 +216,6 @@ class SessionManager {
 
 
 
-                // Si plus personne
-                // on détruit la session
 
 
                 if(session.players.length === 0){
@@ -175,6 +242,8 @@ class SessionManager {
 
 
 
+
+
                 return {
 
 
@@ -186,6 +255,7 @@ class SessionManager {
                 };
 
 
+
             }
 
 
@@ -195,10 +265,13 @@ class SessionManager {
 
 
 
+
+
         return null;
 
 
     }
+
 
 
 
