@@ -370,7 +370,6 @@ export default class LobbyScene extends Phaser.Scene {
     createChatInput(){
 
 
-
     const input =
     document.createElement("input");
 
@@ -386,19 +385,18 @@ export default class LobbyScene extends Phaser.Scene {
 
 
 
-    // Aligné sous le bloc Chat Phaser
     input.style.left =
-    "calc(75% - 225px)";
+    "calc(75% - 220px)";
 
 
 
     input.style.top =
-    "520px";
+    "500px";
 
 
 
     input.style.width =
-    "320px";
+    "300px";
 
 
 
@@ -408,7 +406,12 @@ export default class LobbyScene extends Phaser.Scene {
 
 
     input.style.fontSize =
-    "20px";
+    "18px";
+
+
+
+    input.style.padding =
+    "5px";
 
 
 
@@ -449,17 +452,17 @@ export default class LobbyScene extends Phaser.Scene {
 
 
     button.style.left =
-    "calc(75% + 105px)";
+    "calc(75% + 85px)";
 
 
 
     button.style.top =
-    "520px";
+    "500px";
 
 
 
     button.style.width =
-    "80px";
+    "75px";
 
 
 
@@ -499,14 +502,16 @@ export default class LobbyScene extends Phaser.Scene {
     ()=>{
 
 
-
         const message =
         input.value.trim();
 
 
 
-        if(message === "")
+        if(
+            message === ""
+        )
             return;
+
 
 
 
@@ -530,9 +535,11 @@ export default class LobbyScene extends Phaser.Scene {
 
 
 
-
     button.onclick =
     sendMessage;
+
+
+
 
 
 
@@ -547,14 +554,15 @@ export default class LobbyScene extends Phaser.Scene {
                 event.key === "Enter"
             ){
 
+
                 sendMessage();
+
 
             }
 
 
         }
     );
-
 
 
 
