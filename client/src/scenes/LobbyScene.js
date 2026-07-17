@@ -12,15 +12,13 @@ export default class LobbyScene extends Phaser.Scene {
 
 
 
+
     init(data){
+
 
         this.session = data.session;
 
-        this.chatTexts = [];
-
         this.playerObjects = [];
-
-        this.avatarTextures = [];
 
     }
 
@@ -31,10 +29,19 @@ export default class LobbyScene extends Phaser.Scene {
     create(){
 
 
-        const width = this.scale.width;
+        const width =
+        this.scale.width;
 
-        const height = this.scale.height;
 
+        const height =
+        this.scale.height;
+
+
+
+
+
+
+        // TITRE
 
 
         this.add.text(
@@ -50,6 +57,10 @@ export default class LobbyScene extends Phaser.Scene {
 
 
 
+
+
+
+        // CODE SESSION
 
 
         this.add.text(
@@ -69,6 +80,9 @@ export default class LobbyScene extends Phaser.Scene {
 
 
 
+        // JOUEURS
+
+
         this.add.text(
             width * 0.25,
             height * 0.30,
@@ -83,13 +97,16 @@ export default class LobbyScene extends Phaser.Scene {
 
 
 
-
         this.displayPlayers();
 
 
 
 
 
+
+
+
+        // CHAT TITRE
 
 
         this.add.text(
@@ -107,8 +124,8 @@ export default class LobbyScene extends Phaser.Scene {
 
 
 
-
         this.createChatHTML();
+
 
         this.createAvatarHTML();
 
@@ -116,6 +133,9 @@ export default class LobbyScene extends Phaser.Scene {
 
 
 
+
+
+        // RECEPTION CHAT
 
 
         SocketManager.onChatMessage(
@@ -137,6 +157,11 @@ export default class LobbyScene extends Phaser.Scene {
 
 
 
+
+
+        // UPDATE JOUEURS
+
+
         SocketManager.onPlayersUpdated(
             (players)=>{
 
@@ -150,6 +175,7 @@ export default class LobbyScene extends Phaser.Scene {
 
             }
         );
+
 
 
 
@@ -173,7 +199,7 @@ export default class LobbyScene extends Phaser.Scene {
 
 
 
-        this.playerObjects=[];
+        this.playerObjects = [];
 
 
 
@@ -184,17 +210,27 @@ export default class LobbyScene extends Phaser.Scene {
 
 
 
-
         this.session.players.forEach(
             (player)=>{
 
 
 
-                this.createPlayerAvatar(
-                    player,
+                const circle =
+                this.add.circle(
                     this.scale.width * 0.12,
-                    y
+                    y,
+                    25,
+                    0x555555
                 );
+
+
+
+                this.playerObjects.push(
+                    circle
+                );
+
+
+
 
 
 
@@ -226,112 +262,6 @@ export default class LobbyScene extends Phaser.Scene {
         );
 
 
-    }
-
-
-
-
-
-
-
-
-
-    createPlayerAvatar(player,x,y){
-
-
-
-        if(player.avatar){
-
-
-
-            const key =
-            "avatar_" + player.id;
-
-
-
-
-
-            if(!this.textures.exists(key)){
-
-
-                this.textures.addBase64(
-                    key,
-                    player.avatar
-                );
-
-
-            }
-
-
-
-
-
-            const image =
-            this.add.image(
-                x,
-                y,
-                key
-            );
-
-
-
-            image.setDisplaySize(
-                50,
-                50
-            );
-
-
-
-
-
-
-            const maskShape =
-            this.make.graphics();
-
-
-
-            maskShape.fillCircle(
-                x,
-                y,
-                25
-            );
-
-
-
-            image.setMask(
-                maskShape.createGeometryMask()
-            );
-
-
-
-            this.playerObjects.push(
-                image
-            );
-
-
-
-        }
-        else{
-
-
-
-            const circle =
-            this.add.circle(
-                x,
-                y,
-                25,
-                0x555555
-            );
-
-
-
-            this.playerObjects.push(
-                circle
-            );
-
-
-        }
-
 
     }
 
@@ -347,31 +277,167 @@ export default class LobbyScene extends Phaser.Scene {
 
 
 
+        const box =
+        document.createElement("div");
+
+
+
+        box.style.position =
+        "absolute";
+
+
+        box.style.left =
+        "65%";
+
+
+        box.style.top =
+        "38%";
+
+
+        box.style.width =
+        "350px";
+
+
+        box.style.height =
+        "250px";
+
+
+        box.style.background =
+        "rgba(20,20,20,0.95)";
+
+
+        box.style.border =
+        "2px solid #555";
+
+
+        box.style.borderRadius =
+        "15px";
+
+
+        box.style.padding =
+        "10px";
+
+
+        box.style.display =
+        "flex";
+
+
+        box.style.flexDirection =
+        "column";
+
+
+
+        document.body.appendChild(
+            box
+        );
+
+
+
+
+
+
+
+
+        const messages =
+        document.createElement("div");
+
+
+
+        messages.style.flex =
+        "1";
+
+
+        messages.style.overflowY =
+        "auto";
+
+
+        messages.style.color =
+        "white";
+
+
+        messages.style.fontSize =
+        "18px";
+
+
+
+        messages.style.padding =
+        "5px";
+
+
+
+        box.appendChild(
+            messages
+        );
+
+
+
+
+
+
+
+
+        const bottom =
+        document.createElement("div");
+
+
+
+        bottom.style.display =
+        "flex";
+
+
+        bottom.style.gap =
+        "5px";
+
+
+
+        box.appendChild(
+            bottom
+        );
+
+
+
+
+
+
+
+
         const input =
         document.createElement("input");
+
+
 
         input.placeholder =
         "Message...";
 
-        input.style.position =
-        "absolute";
 
-        input.style.left =
-        "65%";
 
-        input.style.top =
-        "70%";
+        input.style.flex =
+        "1";
 
-        input.style.width =
-        "300px";
 
         input.style.height =
-        "40px";
+        "35px";
 
 
-        document.body.appendChild(
+        input.style.borderRadius =
+        "8px";
+
+
+        input.style.border =
+        "none";
+
+
+        input.style.padding =
+        "5px";
+
+
+
+        bottom.appendChild(
             input
         );
+
+
+
 
 
 
@@ -381,24 +447,38 @@ export default class LobbyScene extends Phaser.Scene {
         document.createElement("button");
 
 
+
         button.innerText =
         "Envoyer";
 
 
-        button.style.position =
-        "absolute";
+
+        button.style.height =
+        "35px";
 
 
-        button.style.left =
-        "65%";
+        button.style.borderRadius =
+        "8px";
 
 
-        button.style.top =
-        "77%";
+        button.style.border =
+        "none";
+
+
+        button.style.background =
+        "#00ff00";
+
+
+        button.style.cursor =
+        "pointer";
+
+
+        button.style.fontWeight =
+        "bold";
 
 
 
-        document.body.appendChild(
+        bottom.appendChild(
             button
         );
 
@@ -408,7 +488,9 @@ export default class LobbyScene extends Phaser.Scene {
 
 
 
-        button.onclick =
+
+
+        const send =
         ()=>{
 
 
@@ -439,9 +521,41 @@ export default class LobbyScene extends Phaser.Scene {
 
 
 
-        this.chatInput=input;
 
-        this.chatButton=button;
+
+
+        button.onclick =
+        send;
+
+
+
+        input.addEventListener(
+            "keydown",
+            (event)=>{
+
+
+                if(event.key==="Enter"){
+
+
+                    send();
+
+
+                }
+
+
+            }
+        );
+
+
+
+
+
+        this.chatBox =
+        box;
+
+
+        this.chatMessagesContainer =
+        messages;
 
 
     }
@@ -458,23 +572,29 @@ export default class LobbyScene extends Phaser.Scene {
 
 
 
-        const text =
-        this.add.text(
-            this.scale.width * 0.75,
-            this.scale.height * 0.40 +
-            this.chatTexts.length * 30,
-            message,
-            {
-                fontSize:"20px",
-                color:"#ffffff"
-            }
+        const line =
+        document.createElement("div");
+
+
+
+        line.innerText =
+        message;
+
+
+
+        line.style.marginBottom =
+        "5px";
+
+
+
+        this.chatMessagesContainer.appendChild(
+            line
         );
 
 
 
-        this.chatTexts.push(
-            text
-        );
+        this.chatMessagesContainer.scrollTop =
+        this.chatMessagesContainer.scrollHeight;
 
 
     }
@@ -500,7 +620,6 @@ export default class LobbyScene extends Phaser.Scene {
         "file";
 
 
-
         fileInput.accept =
         "image/*";
 
@@ -510,10 +629,8 @@ export default class LobbyScene extends Phaser.Scene {
         "absolute";
 
 
-
         fileInput.style.left =
         "65%";
-
 
 
         fileInput.style.top =
@@ -524,7 +641,6 @@ export default class LobbyScene extends Phaser.Scene {
         document.body.appendChild(
             fileInput
         );
-
 
 
 
@@ -541,6 +657,7 @@ export default class LobbyScene extends Phaser.Scene {
 
             if(!file)
                 return;
+
 
 
 
@@ -570,19 +687,21 @@ export default class LobbyScene extends Phaser.Scene {
 
 
 
-
-            reader.readAsDataURL(file);
-
+            reader.readAsDataURL(
+                file
+            );
 
 
         };
 
 
 
-        this.avatarInput=fileInput;
+        this.avatarInput =
+        fileInput;
 
 
     }
+
 
 
 
@@ -595,18 +714,14 @@ export default class LobbyScene extends Phaser.Scene {
 
 
 
-        if(this.chatInput)
-            this.chatInput.remove();
-
-
-
-        if(this.chatButton)
-            this.chatButton.remove();
+        if(this.chatBox)
+            this.chatBox.remove();
 
 
 
         if(this.avatarInput)
             this.avatarInput.remove();
+
 
 
     }
