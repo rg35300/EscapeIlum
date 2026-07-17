@@ -371,186 +371,189 @@ export default class LobbyScene extends Phaser.Scene {
 
 
 
-        const input =
-        document.createElement("input");
+    const input =
+    document.createElement("input");
 
 
 
-        input.placeholder =
-        "Message...";
+    input.placeholder =
+    "Message...";
+
+
+
+    input.style.position =
+    "absolute";
+
+
+
+    // Aligné sous le bloc Chat Phaser
+    input.style.left =
+    "calc(75% - 225px)";
+
+
+
+    input.style.top =
+    "520px";
+
+
+
+    input.style.width =
+    "320px";
+
+
+
+    input.style.height =
+    "35px";
+
+
+
+    input.style.fontSize =
+    "20px";
+
+
+
+    input.style.borderRadius =
+    "5px";
+
+
+
+    input.style.boxSizing =
+    "border-box";
+
+
+
+    document.body.appendChild(
+        input
+    );
 
 
 
 
-        input.style.position =
-        "absolute";
-
-
-
-        input.style.left = "calc(50% + 180px)";
-        input.style.top = "540px";
 
 
 
 
-        input.style.width =
-        "280px";
+    const button =
+    document.createElement("button");
 
 
 
-        input.style.height =
-        "40px";
+    button.innerText =
+    "SEND";
 
 
 
-        input.style.fontSize =
-        "20px";
+    button.style.position =
+    "absolute";
 
 
 
-        input.style.borderRadius =
-        "5px";
+    button.style.left =
+    "calc(75% + 105px)";
+
+
+
+    button.style.top =
+    "520px";
+
+
+
+    button.style.width =
+    "80px";
+
+
+
+    button.style.height =
+    "35px";
+
+
+
+    button.style.fontSize =
+    "18px";
+
+
+
+    button.style.cursor =
+    "pointer";
+
+
+
+    button.style.borderRadius =
+    "5px";
+
+
+
+    document.body.appendChild(
+        button
+    );
 
 
 
 
-        document.body.appendChild(
-            input
+
+
+
+
+
+    const sendMessage =
+    ()=>{
+
+
+
+        const message =
+        input.value.trim();
+
+
+
+        if(message === "")
+            return;
+
+
+
+
+        SocketManager.sendChatMessage(
+            message
         );
 
 
 
+        input.value = "";
 
 
 
+    };
 
 
 
-        const button =
-        document.createElement("button");
 
 
 
-        button.innerText =
-        "SEND";
 
 
 
+    button.onclick =
+    sendMessage;
 
 
-        button.style.position =
-        "absolute";
 
 
 
-        button.style.left = "calc(50% + 470px)";
-button.style.top = "540px";
+    input.addEventListener(
+        "keydown",
+        (event)=>{
 
 
+            if(
+                event.key === "Enter"
+            ){
 
-        button.style.width =
-        "90px";
-
-
-
-        button.style.height =
-        "40px";
-
-
-
-        button.style.fontSize =
-        "18px";
-
-
-
-        button.style.cursor =
-        "pointer";
-
-
-
-
-
-        document.body.appendChild(
-            button
-        );
-
-
-
-
-
-
-
-
-
-        const sendMessage =
-        ()=>{
-
-
-            const message =
-            input.value.trim();
-
-
-
-
-
-            if(message === "")
-                return;
-
-
-
-
-
-
-            SocketManager.sendChatMessage(
-                message
-            );
-
-
-
-
-
-
-            input.value = "";
-
-
-
-        };
-
-
-
-
-
-
-
-
-
-        button.onclick =
-        sendMessage;
-
-
-
-
-
-
-
-        input.addEventListener(
-            "keydown",
-            (event)=>{
-
-
-                if(
-                    event.key === "Enter"
-                ){
-
-
-                    sendMessage();
-
-
-                }
-
+                sendMessage();
 
             }
-        );
+
+
+        }
+    );
 
 
 
@@ -558,17 +561,19 @@ button.style.top = "540px";
 
 
 
-        this.chatInput =
-        input;
+
+
+    this.chatInput =
+    input;
 
 
 
-        this.chatButton =
-        button;
+    this.chatButton =
+    button;
 
 
 
-    }
+}
 
 
 
