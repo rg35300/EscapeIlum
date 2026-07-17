@@ -28,12 +28,6 @@ export default class MenuScene extends Phaser.Scene {
 
 
 
-        const height =
-        this.scale.height;
-
-
-
-
 
 
 
@@ -48,6 +42,8 @@ export default class MenuScene extends Phaser.Scene {
             }
         )
         .setOrigin(0.5);
+
+
 
 
 
@@ -80,6 +76,7 @@ export default class MenuScene extends Phaser.Scene {
 
 
 
+
         const avatars = [
 
             "SAMOYED_1",
@@ -91,6 +88,8 @@ export default class MenuScene extends Phaser.Scene {
             "SAMOYED_7"
 
         ];
+
+
 
 
 
@@ -112,8 +111,12 @@ export default class MenuScene extends Phaser.Scene {
 
 
 
+
+
         avatars.forEach(
             (avatar,index)=>{
+
+
 
 
 
@@ -127,6 +130,9 @@ export default class MenuScene extends Phaser.Scene {
 
 
 
+
+
+
                 img.setDisplaySize(
                     60,
                     60
@@ -135,7 +141,14 @@ export default class MenuScene extends Phaser.Scene {
 
 
 
+
+
+
+
                 img.setInteractive();
+
+
+
 
 
 
@@ -156,6 +169,7 @@ export default class MenuScene extends Phaser.Scene {
                         );
 
 
+
                     }
                 );
 
@@ -171,12 +185,16 @@ export default class MenuScene extends Phaser.Scene {
 
                     image:img
 
+
                 });
+
 
 
 
             }
         );
+
+
 
 
 
@@ -198,7 +216,12 @@ export default class MenuScene extends Phaser.Scene {
         this.createHTMLMenu();
 
 
+
     }
+
+
+
+
 
 
 
@@ -212,13 +235,18 @@ export default class MenuScene extends Phaser.Scene {
 
 
 
+
+
         const container =
         document.createElement("div");
 
 
 
+
+
         this.htmlContainer =
         container;
+
 
 
 
@@ -237,7 +265,7 @@ export default class MenuScene extends Phaser.Scene {
 
 
         container.style.top =
-        "380px";
+        "345px";
 
 
 
@@ -262,7 +290,10 @@ export default class MenuScene extends Phaser.Scene {
 
 
         container.style.gap =
-        "12px";
+        "8px";
+
+
+
 
 
 
@@ -280,14 +311,17 @@ export default class MenuScene extends Phaser.Scene {
 
 
 
-
         const nameInput =
         document.createElement("input");
 
 
 
+
+
         nameInput.value =
         "Player";
+
+
 
 
 
@@ -297,10 +331,11 @@ export default class MenuScene extends Phaser.Scene {
 
 
 
+
+
         container.appendChild(
             nameInput
         );
-
 
 
 
@@ -318,10 +353,11 @@ export default class MenuScene extends Phaser.Scene {
 
 
 
+
+
         container.appendChild(
             hostButton
         );
-
 
 
 
@@ -336,14 +372,20 @@ export default class MenuScene extends Phaser.Scene {
 
 
 
+
+
         codeInput.placeholder =
         "Lobby Code";
+
+
 
 
 
         this.styleInput(
             codeInput
         );
+
+
 
 
 
@@ -359,12 +401,13 @@ export default class MenuScene extends Phaser.Scene {
 
 
 
-
         const joinButton =
         this.createHTMLButton(
             "JOIN",
             "#00ffff"
         );
+
+
 
 
 
@@ -385,7 +428,11 @@ export default class MenuScene extends Phaser.Scene {
 
 
 
+
+
             SocketManager.connect();
+
+
 
 
 
@@ -396,7 +443,11 @@ export default class MenuScene extends Phaser.Scene {
 
 
 
+
+
                     this.cleanHTML();
+
+
 
 
 
@@ -418,15 +469,21 @@ export default class MenuScene extends Phaser.Scene {
 
 
 
+
             SocketManager.createSession({
+
 
                 map:"factory_01",
 
+
                 name:nameInput.value,
+
 
                 avatar:this.selectedAvatar
 
+
             });
+
 
 
 
@@ -445,7 +502,10 @@ export default class MenuScene extends Phaser.Scene {
 
 
 
+
+
             SocketManager.connect();
+
 
 
 
@@ -458,7 +518,11 @@ export default class MenuScene extends Phaser.Scene {
 
 
 
+
+
                     this.cleanHTML();
+
+
 
 
 
@@ -481,19 +545,25 @@ export default class MenuScene extends Phaser.Scene {
 
 
 
+
             SocketManager.joinSession({
+
 
                 sessionId:
                 codeInput.value.toUpperCase(),
 
 
+
                 name:nameInput.value,
+
 
 
                 avatar:this.selectedAvatar
 
 
+
             });
+
 
 
 
@@ -501,8 +571,10 @@ export default class MenuScene extends Phaser.Scene {
 
 
 
-
     }
+
+
+
 
 
 
@@ -516,14 +588,21 @@ export default class MenuScene extends Phaser.Scene {
 
 
 
+
+
         this.avatarImages.forEach(
             (data)=>{
+
+
+
 
 
 
                 if(
                     data.name === selected
                 ){
+
+
 
 
 
@@ -534,14 +613,20 @@ export default class MenuScene extends Phaser.Scene {
 
 
 
+
+
                     data.image.setDepth(
                         10
                     );
 
 
 
+
                 }
                 else{
+
+
+
 
 
                     data.image.setDisplaySize(
@@ -551,9 +636,12 @@ export default class MenuScene extends Phaser.Scene {
 
 
 
+
+
                     data.image.setDepth(
                         0
                     );
+
 
 
 
@@ -566,7 +654,12 @@ export default class MenuScene extends Phaser.Scene {
 
 
 
+
     }
+
+
+
+
 
 
 
@@ -610,6 +703,9 @@ export default class MenuScene extends Phaser.Scene {
 
 
 
+
+
+
     createHTMLButton(text,color){
 
 
@@ -619,8 +715,12 @@ export default class MenuScene extends Phaser.Scene {
 
 
 
+
+
         button.innerText =
         text;
+
+
 
 
 
@@ -646,8 +746,12 @@ export default class MenuScene extends Phaser.Scene {
 
 
 
+
+
         button.style.background =
         "#222";
+
+
 
 
 
@@ -656,10 +760,18 @@ export default class MenuScene extends Phaser.Scene {
 
 
 
+
+
+
+
         return button;
 
 
+
     }
+
+
+
 
 
 
@@ -684,7 +796,11 @@ export default class MenuScene extends Phaser.Scene {
         }
 
 
+
     }
+
+
+
 
 
 
@@ -698,6 +814,8 @@ export default class MenuScene extends Phaser.Scene {
 
 
     }
+
+
 
 
 

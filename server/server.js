@@ -299,96 +299,87 @@ io.on(
     // CHAT
 
 
-    socket.on(
-        EVENTS.CHAT_MESSAGE,
-        (message)=>{
+    // CHAT
+
+
+socket.on(
+    EVENTS.CHAT_MESSAGE,
+    (message)=>{
+
+
+        const rooms =
+        Array.from(
+            socket.rooms
+        );
 
 
 
-            const rooms =
-            Array.from(
-                socket.rooms
-            );
+        const sessionId =
+        rooms.find(
+            room=>room !== socket.id
+        );
 
 
 
-            const sessionId =
-            rooms.find(
-                room=>room !== socket.id
-            );
-
-
-
-
-
-            if(!sessionId)
-                return;
-
-
-
-
-
-
-
-            const player =
-            Object.values(
-                sessions.getSession(sessionId).players
-            )
-            .find(
-                p=>p.id === socket.id
-            );
+        if(!sessionId)
+            return;
 
 
 
 
+        const session =
+        sessions.getSession(
+            sessionId
+        );
 
 
 
-            const chatMessage = {
-
-
-                name:
-                player
-                ? player.name
-                : "Player",
-
-
-                message:message
-
-
-            };
+        if(!session)
+            return;
 
 
 
 
 
+        const player =
+        session.players.find(
+            p=>p.id === socket.id
+        );
 
 
-            sessions.addMessage(
-                sessionId,
-                chatMessage
-            );
+
+
+
+        const chatMessage = {
+
+
+            name:
+            player
+            ? player.name
+            : "Player",
+
+
+            message:message
+
+
+        };
 
 
 
 
 
 
+        io.to(
+            sessionId
+        )
+        .emit(
+            EVENTS.CHAT_MESSAGE,
+            chatMessage
+        );
 
 
-            io.to(
-                sessionId
-            )
-            .emit(
-                EVENTS.CHAT_MESSAGE,
-                chatMessage
-            );
-
-
-
-        }
-    );
-
+    }
+);
 
 
 
