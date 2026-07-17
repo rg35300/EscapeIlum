@@ -8,9 +8,10 @@ class SocketManager {
 
         this.socket = null;
 
-        this.player = null;
-
     }
+
+
+
 
 
 
@@ -25,8 +26,11 @@ class SocketManager {
 
 
 
+
         this.socket =
         io("https://escapeilum.onrender.com/");
+
+
 
 
 
@@ -45,6 +49,7 @@ class SocketManager {
         );
 
 
+
     }
 
 
@@ -52,14 +57,10 @@ class SocketManager {
 
 
 
+
+
+
     createSession(data){
-
-
-        this.player = {
-
-            name:data.name
-
-        };
 
 
         this.socket.emit(
@@ -75,24 +76,14 @@ class SocketManager {
 
 
 
+
+
     onSessionCreated(callback){
 
 
         this.socket.on(
             "session_created",
-            (session)=>{
-
-
-                this.player =
-                session.players.find(
-                    p=>p.id === this.socket.id
-                );
-
-
-                callback(session);
-
-
-            }
+            callback
         );
 
 
@@ -103,14 +94,9 @@ class SocketManager {
 
 
 
+
+
     joinSession(data){
-
-
-        this.player = {
-
-            name:data.name
-
-        };
 
 
         this.socket.emit(
@@ -127,24 +113,13 @@ class SocketManager {
 
 
 
+
     onSessionJoined(callback){
 
 
         this.socket.on(
             "session_joined",
-            (session)=>{
-
-
-                this.player =
-                session.players.find(
-                    p=>p.id === this.socket.id
-                );
-
-
-                callback(session);
-
-
-            }
+            callback
         );
 
 
@@ -155,19 +130,37 @@ class SocketManager {
 
 
 
-    // CHAT
 
 
-    sendChatMessage(data){
+    onPlayersUpdated(callback){
+
+
+        this.socket.on(
+            "players_updated",
+            callback
+        );
+
+
+    }
+
+
+
+
+
+
+
+    sendChatMessage(message){
 
 
         this.socket.emit(
             "chat_message",
-            data
+            message
         );
 
 
     }
+
+
 
 
 
@@ -187,57 +180,8 @@ class SocketManager {
 
 
 
-
-
-
-    // AVATAR
-
-
-    sendAvatar(data){
-
-
-        this.socket.emit(
-            "avatar_update",
-            data
-        );
-
-
-    }
-
-
-
-
-
-
-
-    onPlayersUpdated(callback){
-
-
-        this.socket.on(
-            "players_updated",
-            (players)=>{
-
-
-                this.player =
-                players.find(
-                    p=>p.id === this.socket.id
-                ) || this.player;
-
-
-
-                callback(players);
-
-
-            }
-        );
-
-
-    }
-
-
-
-
 }
+
 
 
 export default new SocketManager();

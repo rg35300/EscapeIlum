@@ -4,7 +4,7 @@ import MenuScene from "./scenes/MenuScene.js";
 
 import LobbyScene from "./scenes/LobbyScene.js";
 
-
+import BootScene from "./scenes/BootScene.js";
 
 const config = {
 
@@ -37,7 +37,9 @@ const config = {
 
         MenuScene,
 
-        LobbyScene
+        LobbyScene,
+
+        BootScene
 
     ]
 

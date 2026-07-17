@@ -15,12 +15,10 @@ export default class LobbyScene extends Phaser.Scene {
 
     init(data){
 
-
         this.session = data.session;
 
-        this.playerObjects = [];
-
     }
+
 
 
 
@@ -41,10 +39,9 @@ export default class LobbyScene extends Phaser.Scene {
 
 
 
-
         this.add.text(
-            width / 2,
-            height * 0.08,
+            width/2,
+            height*0.08,
             "LOBBY",
             {
                 fontSize:"50px",
@@ -59,9 +56,10 @@ export default class LobbyScene extends Phaser.Scene {
 
 
 
+
         this.add.text(
-            width / 2,
-            height * 0.18,
+            width/2,
+            height*0.18,
             "Session code : " + this.session.id,
             {
                 fontSize:"30px",
@@ -77,22 +75,18 @@ export default class LobbyScene extends Phaser.Scene {
 
 
 
-        this.add.text(
-            width * 0.25,
-            height * 0.30,
-            "Players",
-            {
-                fontSize:"32px",
-                color:"#ffffff"
-            }
-        )
-        .setOrigin(0.5);
+        this.playersContainer =
+        this.add.container(
+            width*0.25,
+            height*0.35
+        );
 
 
 
+        this.drawPlayers(
+            this.session.players
+        );
 
-
-        this.displayPlayers();
 
 
 
@@ -102,8 +96,8 @@ export default class LobbyScene extends Phaser.Scene {
 
 
         this.add.text(
-            width * 0.75,
-            height * 0.30,
+            width*0.75,
+            height*0.30,
             "Chat",
             {
                 fontSize:"32px",
@@ -118,47 +112,15 @@ export default class LobbyScene extends Phaser.Scene {
 
 
 
-        this.createChatHTML();
-
-
-        this.createAvatarHTML();
-
-
-
-
-
-
-
-        SocketManager.onChatMessage(
-            (data)=>{
-
-
-                this.addChatMessage(
-                    data.player +
-                    " : " +
-                    data.message
-                );
-
-
-            }
-        );
-
-
-
-
-
-
 
 
         SocketManager.onPlayersUpdated(
             (players)=>{
 
 
-                this.session.players =
-                players;
-
-
-                this.displayPlayers();
+                this.drawPlayers(
+                    players
+                );
 
 
             }
@@ -176,47 +138,42 @@ export default class LobbyScene extends Phaser.Scene {
 
 
 
-
-    displayPlayers(){
-
+    drawPlayers(players){
 
 
-        this.playerObjects.forEach(
-            obj=>obj.destroy()
+        this.playersContainer.removeAll(
+            true
         );
 
 
 
-        this.playerObjects=[];
 
-
-
-        let y =
-        this.scale.height * 0.40;
+        let y = 0;
 
 
 
 
-
-        this.session.players.forEach(
+        players.forEach(
             (player)=>{
 
 
 
-                const circle =
-                this.add.circle(
-                    this.scale.width * 0.12,
+                const avatar =
+                this.add.image(
+                    -120,
                     y,
-                    25,
-                    0x555555
+                    player.avatar || "SAMOYED_1"
                 );
 
 
 
-                this.playerObjects.push(
-                    circle
+                avatar.setDisplaySize(
+                    60,
+                    60
                 );
 
+
+                avatar.setCircleCrop();
 
 
 
@@ -224,7 +181,7 @@ export default class LobbyScene extends Phaser.Scene {
 
                 const name =
                 this.add.text(
-                    this.scale.width * 0.25,
+                    -50,
                     y,
                     player.name,
                     {
@@ -232,17 +189,26 @@ export default class LobbyScene extends Phaser.Scene {
                         color:"#ffffff"
                     }
                 )
-                .setOrigin(0.5);
-
-
-
-                this.playerObjects.push(
-                    name
+                .setOrigin(
+                    0,
+                    0.5
                 );
 
 
 
-                y += 60;
+
+
+                this.playersContainer.add(
+                    [
+                        avatar,
+                        name
+                    ]
+                );
+
+
+
+                y += 80;
+
 
 
             }
@@ -251,555 +217,6 @@ export default class LobbyScene extends Phaser.Scene {
 
     }
 
-
-
-
-
-
-
-
-
-    createChatHTML(){
-
-
-
-        const box =
-        document.createElement("div");
-
-
-
-        box.style.position =
-        "absolute";
-
-
-        box.style.left =
-        "65%";
-
-
-        box.style.top =
-        "38%";
-
-
-        box.style.width =
-        "350px";
-
-
-        box.style.height =
-        "250px";
-
-
-        box.style.background =
-        "rgba(20,20,20,0.95)";
-
-
-        box.style.border =
-        "2px solid #555";
-
-
-        box.style.borderRadius =
-        "15px";
-
-
-        box.style.padding =
-        "10px";
-
-
-        box.style.display =
-        "flex";
-
-
-        box.style.flexDirection =
-        "column";
-
-
-
-        document.body.appendChild(
-            box
-        );
-
-
-
-
-
-
-
-        const messages =
-        document.createElement("div");
-
-
-
-        messages.style.flex =
-        "1";
-
-
-        messages.style.overflowY =
-        "auto";
-
-
-        messages.style.color =
-        "white";
-
-
-        messages.style.fontSize =
-        "18px";
-
-
-        messages.style.padding =
-        "5px";
-
-
-
-        box.appendChild(
-            messages
-        );
-
-
-
-
-
-
-
-
-        const bottom =
-        document.createElement("div");
-
-
-
-        bottom.style.display =
-        "flex";
-
-
-        bottom.style.gap =
-        "5px";
-
-
-
-        box.appendChild(
-            bottom
-        );
-
-
-
-
-
-
-
-
-        const input =
-        document.createElement("input");
-
-
-
-        input.placeholder =
-        "Message...";
-
-
-        input.style.flex =
-        "1";
-
-
-        input.style.height =
-        "35px";
-
-
-        input.style.borderRadius =
-        "8px";
-
-
-        input.style.border =
-        "none";
-
-
-        input.style.padding =
-        "5px";
-
-
-
-        bottom.appendChild(
-            input
-        );
-
-
-
-
-
-
-
-
-        const button =
-        document.createElement("button");
-
-
-
-        button.innerText =
-        "Envoyer";
-
-
-        button.style.height =
-        "35px";
-
-
-        button.style.borderRadius =
-        "8px";
-
-
-        button.style.border =
-        "none";
-
-
-        button.style.background =
-        "#00ff00";
-
-
-        button.style.cursor =
-        "pointer";
-
-
-        button.style.fontWeight =
-        "bold";
-
-
-
-        bottom.appendChild(
-            button
-        );
-
-
-
-
-
-
-
-
-
-        const send =
-        ()=>{
-
-
-            if(input.value.trim()==="")
-                return;
-
-
-
-            SocketManager.sendChatMessage({
-
-                sessionId:this.session.id,
-
-                player:
-                SocketManager.player.name,
-
-                message:
-                input.value
-
-            });
-
-
-
-            input.value="";
-
-
-        };
-
-
-
-
-
-
-        button.onclick =
-        send;
-
-
-
-        input.addEventListener(
-            "keydown",
-            (event)=>{
-
-
-                if(event.key==="Enter"){
-
-
-                    send();
-
-
-                }
-
-
-            }
-        );
-
-
-
-
-
-
-        this.chatBox =
-        box;
-
-
-        this.chatMessagesContainer =
-        messages;
-
-
-    }
-
-
-
-
-
-
-
-
-
-    addChatMessage(message){
-
-
-
-        const line =
-        document.createElement("div");
-
-
-
-        line.innerText =
-        message;
-
-
-
-        line.style.marginBottom =
-        "5px";
-
-
-
-        this.chatMessagesContainer.appendChild(
-            line
-        );
-
-
-
-        this.chatMessagesContainer.scrollTop =
-        this.chatMessagesContainer.scrollHeight;
-
-
-    }
-
-
-
-
-
-
-
-
-
-    createAvatarHTML(){
-
-
-
-        const button =
-        document.createElement("button");
-
-
-
-        button.innerText =
-        "📷 Choisir un avatar";
-
-
-
-        button.style.position =
-        "absolute";
-
-
-        button.style.left =
-        "65%";
-
-
-        button.style.top =
-        "82%";
-
-
-        button.style.width =
-        "350px";
-
-
-        button.style.height =
-        "45px";
-
-
-        button.style.borderRadius =
-        "10px";
-
-
-        button.style.border =
-        "none";
-
-
-        button.style.background =
-        "#00ffff";
-
-
-        button.style.color =
-        "#000";
-
-
-        button.style.fontSize =
-        "22px";
-
-
-        button.style.fontWeight =
-        "bold";
-
-
-        button.style.cursor =
-        "pointer";
-
-
-
-        document.body.appendChild(
-            button
-        );
-
-
-
-
-
-
-
-        const fileInput =
-        document.createElement("input");
-
-
-
-        fileInput.type =
-        "file";
-
-
-        fileInput.accept =
-        "image/*";
-
-
-        fileInput.style.display =
-        "none";
-
-
-
-        document.body.appendChild(
-            fileInput
-        );
-
-
-
-
-
-
-
-
-        button.onclick =
-        ()=>{
-
-
-            fileInput.click();
-
-
-        };
-
-
-
-
-
-
-
-
-        fileInput.onchange =
-        ()=>{
-
-
-            const file =
-            fileInput.files[0];
-
-
-
-            if(!file)
-                return;
-
-
-
-
-
-
-
-            const reader =
-            new FileReader();
-
-
-
-
-
-            reader.onload =
-            ()=>{
-
-
-                SocketManager.sendAvatar({
-
-                    sessionId:this.session.id,
-
-                    avatar:reader.result
-
-                });
-
-
-            };
-
-
-
-
-
-            reader.readAsDataURL(
-                file
-            );
-
-
-        };
-
-
-
-
-
-        this.avatarButton =
-        button;
-
-
-        this.avatarInput =
-        fileInput;
-
-
-    }
-
-
-
-
-
-
-
-
-
-    shutdown(){
-
-
-
-        if(this.chatBox)
-            this.chatBox.remove();
-
-
-
-        if(this.avatarButton)
-            this.avatarButton.remove();
-
-
-
-        if(this.avatarInput)
-            this.avatarInput.remove();
-
-
-
-    }
 
 
 

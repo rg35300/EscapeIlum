@@ -12,7 +12,12 @@ export default class MenuScene extends Phaser.Scene {
 
 
 
+
     create(){
+
+
+        this.selectedAvatar = "SAMOYED_1";
+
 
 
         const centerX =
@@ -20,14 +25,12 @@ export default class MenuScene extends Phaser.Scene {
 
 
 
-        // =====================
-        // TITRE
-        // =====================
+
 
 
         this.add.text(
             centerX,
-            80,
+            50,
             "ESCAPE ILUM FACTORY",
             {
                 fontSize:"48px",
@@ -38,10 +41,15 @@ export default class MenuScene extends Phaser.Scene {
 
 
 
-        // Création du conteneur HTML
+
+
+
+
+
 
         const container =
         document.createElement("div");
+
 
 
         container.style.position =
@@ -53,11 +61,11 @@ export default class MenuScene extends Phaser.Scene {
 
 
         container.style.top =
-        "50%";
+        "45%";
 
 
         container.style.transform =
-        "translate(-50%, -35%)";
+        "translate(-50%, -50%)";
 
 
         container.style.display =
@@ -73,7 +81,7 @@ export default class MenuScene extends Phaser.Scene {
 
 
         container.style.gap =
-        "25px";
+        "15px";
 
 
 
@@ -83,9 +91,10 @@ export default class MenuScene extends Phaser.Scene {
 
 
 
-        // =====================
-        // NOM
-        // =====================
+
+
+
+
 
 
         const nameLabel =
@@ -93,7 +102,7 @@ export default class MenuScene extends Phaser.Scene {
 
 
         nameLabel.innerText =
-        "Player's Name";
+        "Player name";
 
 
         nameLabel.style.color =
@@ -101,12 +110,17 @@ export default class MenuScene extends Phaser.Scene {
 
 
         nameLabel.style.fontSize =
-        "28px";
+        "24px";
 
 
         container.appendChild(
             nameLabel
         );
+
+
+
+
+
 
 
 
@@ -129,12 +143,193 @@ export default class MenuScene extends Phaser.Scene {
 
 
 
-        // =====================
-        // CREER
-        // =====================
 
 
-        const createButton =
+
+
+
+
+        const avatarTitle =
+        document.createElement("div");
+
+
+        avatarTitle.innerText =
+        "Choose your avatar";
+
+
+        avatarTitle.style.color =
+        "white";
+
+
+        avatarTitle.style.fontSize =
+        "24px";
+
+
+        container.appendChild(
+            avatarTitle
+        );
+
+
+
+
+
+
+
+
+        const avatarContainer =
+        document.createElement("div");
+
+
+
+        avatarContainer.style.display =
+        "flex";
+
+
+        avatarContainer.style.gap =
+        "10px";
+
+
+        avatarContainer.style.flexWrap =
+        "wrap";
+
+
+        avatarContainer.style.width =
+        "350px";
+
+
+        avatarContainer.style.justifyContent =
+        "center";
+
+
+
+        container.appendChild(
+            avatarContainer
+        );
+
+
+
+
+
+
+
+
+        const avatars = [
+
+            "SAMOYED_1",
+            "SAMOYED_2",
+            "SAMOYED_3",
+            "SAMOYED_4",
+            "SAMOYED_5",
+            "SAMOYED_6",
+            "SAMOYED_7"
+
+        ];
+
+
+
+
+
+
+
+        avatars.forEach(
+            (avatar)=>{
+
+
+                const img =
+                document.createElement("img");
+
+
+
+                img.src =
+                this.textures
+                .get(avatar)
+                .getSourceImage()
+                .src;
+
+
+
+                img.style.width =
+                "70px";
+
+
+                img.style.height =
+                "70px";
+
+
+                img.style.objectFit =
+                "cover";
+
+
+                img.style.borderRadius =
+                "50%";
+
+
+                img.style.cursor =
+                "pointer";
+
+
+                img.style.border =
+                avatar === this.selectedAvatar
+                ?
+                "4px solid #00ff00"
+                :
+                "2px solid white";
+
+
+
+
+
+                img.onclick =
+                ()=>{
+
+
+                    this.selectedAvatar =
+                    avatar;
+
+
+
+                    document
+                    .querySelectorAll(
+                        ".avatarChoice"
+                    )
+                    .forEach(
+                        el=>
+                        el.style.border =
+                        "2px solid white"
+                    );
+
+
+
+                    img.style.border =
+                    "4px solid #00ff00";
+
+
+                };
+
+
+
+                img.className =
+                "avatarChoice";
+
+
+
+                avatarContainer.appendChild(
+                    img
+                );
+
+
+            }
+        );
+
+
+
+
+
+
+
+
+
+        const hostButton =
         this.createHTMLButton(
             "Host",
             "#00ff00"
@@ -142,40 +337,22 @@ export default class MenuScene extends Phaser.Scene {
 
 
         container.appendChild(
-            createButton
+            hostButton
         );
 
 
 
-        // =====================
-        // CODE
-        // =====================
 
 
-        const codeLabel =
-        document.createElement("div");
-
-
-        codeLabel.innerText =
-        "Lobby's Code";
-
-
-        codeLabel.style.color =
-        "white";
-
-
-        codeLabel.style.fontSize =
-        "28px";
-
-
-        container.appendChild(
-            codeLabel
-        );
 
 
 
         const codeInput =
         document.createElement("input");
+
+
+        codeInput.placeholder =
+        "Lobby code";
 
 
         this.styleInput(
@@ -189,9 +366,9 @@ export default class MenuScene extends Phaser.Scene {
 
 
 
-        // =====================
-        // REJOINDRE
-        // =====================
+
+
+
 
 
         const joinButton =
@@ -207,12 +384,13 @@ export default class MenuScene extends Phaser.Scene {
 
 
 
-        // =====================
-        // ACTION CREER
-        // =====================
 
 
-        createButton.onclick =
+
+
+
+
+        hostButton.onclick =
         ()=>{
 
 
@@ -245,7 +423,9 @@ export default class MenuScene extends Phaser.Scene {
 
                 map:"factory_01",
 
-                name:nameInput.value
+                name:nameInput.value,
+
+                avatar:this.selectedAvatar
 
             });
 
@@ -254,9 +434,10 @@ export default class MenuScene extends Phaser.Scene {
 
 
 
-        // =====================
-        // ACTION REJOINDRE
-        // =====================
+
+
+
+
 
 
         joinButton.onclick =
@@ -291,12 +472,16 @@ export default class MenuScene extends Phaser.Scene {
             SocketManager.joinSession({
 
                 sessionId:
-                codeInput.value
-                .toUpperCase(),
+                codeInput.value.toUpperCase(),
 
 
                 name:
-                nameInput.value
+                nameInput.value,
+
+
+                avatar:
+                this.selectedAvatar
+
 
             });
 
@@ -304,7 +489,14 @@ export default class MenuScene extends Phaser.Scene {
         };
 
 
+
     }
+
+
+
+
+
+
 
 
 
@@ -328,6 +520,12 @@ export default class MenuScene extends Phaser.Scene {
 
 
     }
+
+
+
+
+
+
 
 
 
@@ -367,6 +565,24 @@ export default class MenuScene extends Phaser.Scene {
 
 
         return button;
+
+
+    }
+
+
+
+
+    shutdown(){
+
+
+        document
+        .querySelectorAll(
+            "body > div"
+        )
+        .forEach(
+            el=>el.remove()
+        );
+
 
     }
 
