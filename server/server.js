@@ -52,7 +52,6 @@ io.on(
             );
 
 
-
             const player = {
 
                 id:socket.id,
@@ -70,17 +69,14 @@ io.on(
             };
 
 
-
             session.players.push(
                 player
             );
 
 
-
             socket.join(
                 session.id
             );
-
 
 
             socket.emit(
@@ -89,16 +85,12 @@ io.on(
             );
 
 
-            socket.emit(
+            io.to(
+                session.id
+            )
+            .emit(
                 EVENTS.PLAYERS_UPDATED,
                 session
-            );
-
-
-
-            console.log(
-                "Session créée :",
-                session.id
             );
 
 
@@ -131,13 +123,11 @@ io.on(
             };
 
 
-
             const session =
             sessions.joinSession(
                 data.sessionId,
                 player
             );
-
 
 
             if(!session){
@@ -161,7 +151,6 @@ io.on(
             );
 
 
-
             socket.emit(
                 EVENTS.SESSION_JOINED,
                 session
@@ -178,14 +167,6 @@ io.on(
             );
 
 
-
-            console.log(
-                player.name,
-                "a rejoint",
-                session.id
-            );
-
-
         }
     );
 
@@ -198,17 +179,8 @@ io.on(
         (data)=>{
 
 
-            const rooms =
-            Array.from(
-                socket.rooms
-            );
-
-
-
             const sessionId =
-            rooms.find(
-                room=>room !== socket.id
-            );
+            getSessionId(socket);
 
 
 
@@ -252,17 +224,8 @@ io.on(
         ()=>{
 
 
-            const rooms =
-            Array.from(
-                socket.rooms
-            );
-
-
-
             const sessionId =
-            rooms.find(
-                room=>room !== socket.id
-            );
+            getSessionId(socket);
 
 
 
@@ -301,18 +264,6 @@ io.on(
             ){
 
 
-                const game =
-                sessions.setStarting(
-                    sessionId
-                );
-
-
-
-                if(!game)
-                    return;
-
-
-
                 let count = 5;
 
 
@@ -331,7 +282,6 @@ io.on(
                     );
 
 
-
                     count--;
 
 
@@ -342,7 +292,6 @@ io.on(
                         clearInterval(
                             timer
                         );
-
 
 
                         io.to(
@@ -377,17 +326,8 @@ io.on(
         (message)=>{
 
 
-            const rooms =
-            Array.from(
-                socket.rooms
-            );
-
-
-
             const sessionId =
-            rooms.find(
-                room=>room !== socket.id
-            );
+            getSessionId(socket);
 
 
 
@@ -400,7 +340,6 @@ io.on(
             sessions.getSession(
                 sessionId
             );
-
 
 
             if(!session)
@@ -427,7 +366,6 @@ io.on(
                     ? player.name
                     : "Player",
 
-
                     message:message
 
                 }
@@ -446,29 +384,27 @@ io.on(
         ()=>{
 
 
-            console.log(
-                "Déconnexion :",
-                socket.id
-            );
-
-
-
-            const session =
+            const result =
             sessions.removePlayer(
                 socket.id
             );
 
 
 
-            if(session){
+            if(!result)
+                return;
+
+
+
+            if(result.session){
 
 
                 io.to(
-                    session.id
+                    result.session.id
                 )
                 .emit(
                     EVENTS.PLAYERS_UPDATED,
-                    session
+                    result.session
                 );
 
 
@@ -485,9 +421,25 @@ io.on(
 
 
 
+function getSessionId(socket){
+
+
+    return Array.from(
+        socket.rooms
+    )
+    .find(
+        room=>room !== socket.id
+    );
+
+
+}
+
+
+
+
+
 const PORT =
 process.env.PORT || 3000;
-
 
 
 server.listen(

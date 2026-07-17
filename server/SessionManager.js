@@ -90,87 +90,117 @@ class SessionManager {
     changeRole(sessionId,socketId,role){
 
 
-        const session =
-        this.sessions[sessionId];
+    const session =
+    this.sessions[sessionId];
 
 
-        if(!session)
-            return null;
-
-
-
-        const player =
-        session.players.find(
-            p=>p.id === socketId
-        );
+    if(!session)
+        return null;
 
 
 
-        if(!player)
-            return null;
+    const player =
+    session.players.find(
+        p=>p.id === socketId
+    );
 
 
 
-        if(session.ilum?.id === socketId){
-
-            session.ilum = null;
-
-        }
+    if(!player)
+        return null;
 
 
 
-        session.employees =
-        session.employees.filter(
-            p=>p.id !== socketId
-        );
-
-
-
-        if(role === "ilum"){
-
-
-            if(session.ilum)
-                return null;
-
-
-
-            player.role =
-            "ilum";
-
-
-
-            session.ilum =
-            player;
-
-
-        }
-
-
-
-        if(role === "employee"){
-
-
-            if(session.employees.length >= 4)
-                return null;
-
-
-
-            player.role =
-            "employee";
-
-
-
-            session.employees.push(
-                player
-            );
-
-        }
-
-
-
+    if(player.role === role)
         return session;
 
+
+
+    if(role === "ilum"){
+
+
+        if(session.ilum && session.ilum.id !== socketId)
+            return null;
+
+
     }
+
+
+
+    if(role === "employee"){
+
+
+        const employeeCount =
+        session.employees.filter(
+            p=>p.id !== socketId
+        ).length;
+
+
+
+        if(employeeCount >= 4)
+            return null;
+
+
+    }
+
+
+
+    // retirer ancien rôle
+
+
+    if(session.ilum?.id === socketId){
+
+        session.ilum = null;
+
+    }
+
+
+
+    session.employees =
+    session.employees.filter(
+        p=>p.id !== socketId
+    );
+
+
+
+    // appliquer nouveau rôle
+
+
+    player.role =
+    role;
+
+
+    player.ready =
+    false;
+
+
+
+    if(role === "ilum"){
+
+
+        session.ilum =
+        player;
+
+
+    }
+
+
+
+    if(role === "employee"){
+
+
+        session.employees.push(
+            player
+        );
+
+
+    }
+
+
+
+    return session;
+
+}
 
 
 

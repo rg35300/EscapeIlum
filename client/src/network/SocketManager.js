@@ -14,12 +14,15 @@ class SocketManager {
 
     connect(){
 
+
         if(this.socket)
             return;
 
 
+
         this.socket =
         io("https://escapeilum.onrender.com/");
+
 
 
         this.socket.on(
@@ -27,12 +30,13 @@ class SocketManager {
             ()=>{
 
                 console.log(
-                    "Connecté :",
+                    "Connecté au serveur :",
                     this.socket.id
                 );
 
             }
         );
+
 
     }
 
@@ -42,10 +46,12 @@ class SocketManager {
 
     createSession(data){
 
+
         this.socket.emit(
             "create_session",
             data
         );
+
 
     }
 
@@ -55,10 +61,12 @@ class SocketManager {
 
     onSessionCreated(callback){
 
+
         this.socket.on(
             "session_created",
             callback
         );
+
 
     }
 
@@ -68,10 +76,12 @@ class SocketManager {
 
     joinSession(data){
 
+
         this.socket.emit(
             "join_session",
             data
         );
+
 
     }
 
@@ -81,10 +91,12 @@ class SocketManager {
 
     onSessionJoined(callback){
 
+
         this.socket.on(
             "session_joined",
             callback
         );
+
 
     }
 
@@ -94,10 +106,12 @@ class SocketManager {
 
     onPlayersUpdated(callback){
 
+
         this.socket.on(
             "players_updated",
             callback
         );
+
 
     }
 
@@ -107,12 +121,14 @@ class SocketManager {
 
     changeRole(role){
 
+
         this.socket.emit(
             "change_role",
             {
                 role:role
             }
         );
+
 
     }
 
@@ -122,9 +138,11 @@ class SocketManager {
 
     playerReady(){
 
+
         this.socket.emit(
             "player_ready"
         );
+
 
     }
 
@@ -134,10 +152,12 @@ class SocketManager {
 
     onGameCountdown(callback){
 
+
         this.socket.on(
             "game_countdown",
             callback
         );
+
 
     }
 
@@ -147,10 +167,12 @@ class SocketManager {
 
     onStartGame(callback){
 
+
         this.socket.on(
             "start_game",
             callback
         );
+
 
     }
 
@@ -160,10 +182,12 @@ class SocketManager {
 
     sendChatMessage(message){
 
+
         this.socket.emit(
             "chat_message",
             message
         );
+
 
     }
 
@@ -173,12 +197,15 @@ class SocketManager {
 
     onChatMessage(callback){
 
+
         this.socket.on(
             "chat_message",
             callback
         );
 
+
     }
+
 
 
 }

@@ -10,7 +10,11 @@ const EVENTS = {
 
     PLAYERS_UPDATED: "players_updated",
 
+    CHANGE_ROLE: "change_role",
+
     PLAYER_READY: "player_ready",
+
+    GAME_COUNTDOWN: "game_countdown",
 
     START_GAME: "start_game",
 
