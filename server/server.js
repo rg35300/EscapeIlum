@@ -17,11 +17,14 @@ http.createServer(app);
 
 
 const io =
-new Server(server,{
-    cors:{
-        origin:"*"
+new Server(
+    server,
+    {
+        cors:{
+            origin:"*"
+        }
     }
-});
+);
 
 
 const sessions =
@@ -69,9 +72,11 @@ io.on(
             };
 
 
+
             session.players.push(
                 player
             );
+
 
 
             socket.join(
@@ -79,10 +84,12 @@ io.on(
             );
 
 
+
             socket.emit(
                 EVENTS.SESSION_CREATED,
                 session
             );
+
 
 
             io.to(
@@ -123,11 +130,13 @@ io.on(
             };
 
 
+
             const session =
             sessions.joinSession(
                 data.sessionId,
                 player
             );
+
 
 
             if(!session){
@@ -141,7 +150,6 @@ io.on(
 
                 return;
 
-
             }
 
 
@@ -149,6 +157,7 @@ io.on(
             socket.join(
                 session.id
             );
+
 
 
             socket.emit(
@@ -169,6 +178,8 @@ io.on(
 
         }
     );
+
+
 
 
 
@@ -219,6 +230,8 @@ io.on(
 
 
 
+
+
     socket.on(
         EVENTS.PLAYER_READY,
         ()=>{
@@ -264,50 +277,63 @@ io.on(
             ){
 
 
+                if(session.starting)
+                    return;
+
+
+
+                sessions.setStarting(
+                    sessionId
+                );
+
+
+
                 let count = 5;
 
 
 
                 const timer =
                 setInterval(
-                ()=>{
-
-
-                    io.to(
-                        sessionId
-                    )
-                    .emit(
-                        EVENTS.GAME_COUNTDOWN,
-                        count
-                    );
-
-
-                    count--;
-
-
-
-                    if(count < 0){
-
-
-                        clearInterval(
-                            timer
-                        );
+                    ()=>{
 
 
                         io.to(
                             sessionId
                         )
                         .emit(
-                            EVENTS.START_GAME,
-                            session
+                            EVENTS.GAME_COUNTDOWN,
+                            count
                         );
 
 
-                    }
+
+                        count--;
 
 
-                },
-                1000
+
+                        if(count < 0){
+
+
+                            clearInterval(
+                                timer
+                            );
+
+
+
+                            io.to(
+                                sessionId
+                            )
+                            .emit(
+                                EVENTS.START_GAME,
+                                session
+                            );
+
+
+                        }
+
+
+                    },
+                    1000
                 );
 
 
@@ -316,6 +342,9 @@ io.on(
 
         }
     );
+
+
+
 
 
 
@@ -342,6 +371,7 @@ io.on(
             );
 
 
+
             if(!session)
                 return;
 
@@ -354,26 +384,35 @@ io.on(
 
 
 
+            const chatMessage = {
+
+
+                name:
+                player
+                ? player.name
+                : "Player",
+
+
+                message:message
+
+
+            };
+
+
+
             io.to(
                 sessionId
             )
             .emit(
                 EVENTS.CHAT_MESSAGE,
-                {
-
-                    name:
-                    player
-                    ? player.name
-                    : "Player",
-
-                    message:message
-
-                }
+                chatMessage
             );
 
 
         }
     );
+
+
 
 
 
@@ -384,31 +423,32 @@ io.on(
         ()=>{
 
 
-            const result =
+            console.log(
+                "Déconnexion :",
+                socket.id
+            );
+
+
+
+            const session =
             sessions.removePlayer(
                 socket.id
             );
 
 
 
-            if(!result)
+            if(!session)
                 return;
 
 
 
-            if(result.session){
-
-
-                io.to(
-                    result.session.id
-                )
-                .emit(
-                    EVENTS.PLAYERS_UPDATED,
-                    result.session
-                );
-
-
-            }
+            io.to(
+                session.id
+            )
+            .emit(
+                EVENTS.PLAYERS_UPDATED,
+                session
+            );
 
 
         }
@@ -416,6 +456,8 @@ io.on(
 
 
 });
+
+
 
 
 
@@ -438,8 +480,11 @@ function getSessionId(socket){
 
 
 
+
+
 const PORT =
 process.env.PORT || 3000;
+
 
 
 server.listen(

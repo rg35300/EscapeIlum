@@ -21,7 +21,9 @@ class SocketManager {
 
 
         this.socket =
-        io("https://escapeilum.onrender.com/");
+        io(
+            "https://escapeilum.onrender.com/"
+        );
 
 
 
@@ -29,10 +31,12 @@ class SocketManager {
             "connect",
             ()=>{
 
+
                 console.log(
                     "Connecté au serveur :",
                     this.socket.id
                 );
+
 
             }
         );
@@ -205,6 +209,28 @@ class SocketManager {
 
 
     }
+
+
+
+
+
+    removeListener(event,callback){
+
+
+        if(!this.socket)
+            return;
+
+
+
+        this.socket.off(
+            event,
+            callback
+        );
+
+
+    }
+
+
 
 
 

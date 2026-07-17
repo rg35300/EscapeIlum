@@ -9,18 +9,22 @@ import EmployeeScene from "./scenes/EmployeeScene.js";
 
 const config = {
 
-    type: Phaser.AUTO,
+
+    type:Phaser.AUTO,
 
 
     scale:{
 
-        mode: Phaser.Scale.FIT,
 
-        autoCenter: Phaser.Scale.CENTER_BOTH,
+        mode:Phaser.Scale.FIT,
+
+        autoCenter:
+        Phaser.Scale.CENTER_BOTH,
 
         width:1280,
 
         height:720
+
 
     },
 
@@ -42,7 +46,11 @@ const config = {
 
     ]
 
+
 };
 
 
-new Phaser.Game(config);
+
+new Phaser.Game(
+    config
+);
