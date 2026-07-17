@@ -6,29 +6,19 @@ const { Server } = require("socket.io");
 const SessionManager = require("./SessionManager");
 const EVENTS = require("./events");
 
-
 const app = express();
 
 app.use(cors());
 
+const server = http.createServer(app);
 
-const server =
-http.createServer(app);
-
-
-const io =
-new Server(
-    server,
-    {
-        cors:{
-            origin:"*"
-        }
+const io = new Server(server,{
+    cors:{
+        origin:"*"
     }
-);
+});
 
-
-const sessions =
-new SessionManager();
+const sessions = new SessionManager();
 
 
 
@@ -59,11 +49,9 @@ io.on(
 
                 id:socket.id,
 
-                name:
-                data.name || "Player",
+                name:data.name || "Player",
 
-                avatar:
-                data.avatar || "SAMOYED_1",
+                avatar:data.avatar || "SAMOYED_1",
 
                 role:null,
 
@@ -72,11 +60,9 @@ io.on(
             };
 
 
-
             session.players.push(
                 player
             );
-
 
 
             socket.join(
@@ -84,12 +70,10 @@ io.on(
             );
 
 
-
             socket.emit(
                 EVENTS.SESSION_CREATED,
                 session
             );
-
 
 
             io.to(
@@ -103,8 +87,6 @@ io.on(
 
         }
     );
-
-
 
 
 
@@ -117,18 +99,15 @@ io.on(
 
                 id:socket.id,
 
-                name:
-                data.name || "Player",
+                name:data.name || "Player",
 
-                avatar:
-                data.avatar || "SAMOYED_1",
+                avatar:data.avatar || "SAMOYED_1",
 
                 role:null,
 
                 ready:false
 
             };
-
 
 
             const session =
@@ -138,20 +117,16 @@ io.on(
             );
 
 
-
             if(!session){
-
 
                 socket.emit(
                     "join_error",
                     "Code invalide"
                 );
 
-
                 return;
 
             }
-
 
 
             socket.join(
@@ -159,12 +134,10 @@ io.on(
             );
 
 
-
             socket.emit(
                 EVENTS.SESSION_JOINED,
                 session
             );
-
 
 
             io.to(
@@ -181,10 +154,6 @@ io.on(
 
 
 
-
-
-
-
     socket.on(
         EVENTS.CHANGE_ROLE,
         (data)=>{
@@ -194,10 +163,8 @@ io.on(
             getSessionId(socket);
 
 
-
             if(!sessionId)
                 return;
-
 
 
             const session =
@@ -208,10 +175,8 @@ io.on(
             );
 
 
-
             if(!session)
                 return;
-
 
 
             io.to(
@@ -228,10 +193,6 @@ io.on(
 
 
 
-
-
-
-
     socket.on(
         EVENTS.PLAYER_READY,
         ()=>{
@@ -241,10 +202,8 @@ io.on(
             getSessionId(socket);
 
 
-
             if(!sessionId)
                 return;
-
 
 
             const session =
@@ -254,10 +213,8 @@ io.on(
             );
 
 
-
             if(!session)
                 return;
-
 
 
             io.to(
@@ -277,63 +234,49 @@ io.on(
             ){
 
 
-                if(session.starting)
-                    return;
-
-
-
-                sessions.setStarting(
-                    sessionId
-                );
-
-
-
                 let count = 5;
-
 
 
                 const timer =
                 setInterval(
-                    ()=>{
+                ()=>{
+
+
+                    io.to(
+                        sessionId
+                    )
+                    .emit(
+                        EVENTS.GAME_COUNTDOWN,
+                        count
+                    );
+
+
+                    count--;
+
+
+
+                    if(count < 0){
+
+
+                        clearInterval(
+                            timer
+                        );
 
 
                         io.to(
                             sessionId
                         )
                         .emit(
-                            EVENTS.GAME_COUNTDOWN,
-                            count
+                            EVENTS.START_GAME,
+                            session
                         );
 
 
-
-                        count--;
-
+                    }
 
 
-                        if(count < 0){
-
-
-                            clearInterval(
-                                timer
-                            );
-
-
-
-                            io.to(
-                                sessionId
-                            )
-                            .emit(
-                                EVENTS.START_GAME,
-                                session
-                            );
-
-
-                        }
-
-
-                    },
-                    1000
+                },
+                1000
                 );
 
 
@@ -345,8 +288,42 @@ io.on(
 
 
 
+    socket.on(
+        EVENTS.SAVE_LEVEL,
+        (level)=>{
 
 
+            const sessionId =
+            getSessionId(socket);
+
+
+            if(!sessionId)
+                return;
+
+
+            const session =
+            sessions.saveLevel(
+                sessionId,
+                level
+            );
+
+
+            if(!session)
+                return;
+
+
+
+            io.to(
+                sessionId
+            )
+            .emit(
+                EVENTS.PLAYERS_UPDATED,
+                session
+            );
+
+
+        }
+    );
 
 
 
@@ -359,10 +336,8 @@ io.on(
             getSessionId(socket);
 
 
-
             if(!sessionId)
                 return;
-
 
 
             const session =
@@ -371,10 +346,8 @@ io.on(
             );
 
 
-
             if(!session)
                 return;
-
 
 
             const player =
@@ -383,29 +356,21 @@ io.on(
             );
 
 
-
-            const chatMessage = {
-
-
-                name:
-                player
-                ? player.name
-                : "Player",
-
-
-                message:message
-
-
-            };
-
-
-
             io.to(
                 sessionId
             )
             .emit(
                 EVENTS.CHAT_MESSAGE,
-                chatMessage
+                {
+
+                    name:
+                    player
+                    ? player.name
+                    : "Player",
+
+                    message:message
+
+                }
             );
 
 
@@ -414,20 +379,9 @@ io.on(
 
 
 
-
-
-
-
     socket.on(
         "disconnect",
         ()=>{
-
-
-            console.log(
-                "Déconnexion :",
-                socket.id
-            );
-
 
 
             const session =
@@ -436,10 +390,8 @@ io.on(
             );
 
 
-
             if(!session)
                 return;
-
 
 
             io.to(
@@ -459,12 +411,7 @@ io.on(
 
 
 
-
-
-
-
 function getSessionId(socket){
-
 
     return Array.from(
         socket.rooms
@@ -473,12 +420,7 @@ function getSessionId(socket){
         room=>room !== socket.id
     );
 
-
 }
-
-
-
-
 
 
 
@@ -486,17 +428,14 @@ const PORT =
 process.env.PORT || 3000;
 
 
-
 server.listen(
 PORT,
 "0.0.0.0",
 ()=>{
 
-
     console.log(
         "Serveur EscapeIlum lancé sur le port",
         PORT
     );
-
 
 });

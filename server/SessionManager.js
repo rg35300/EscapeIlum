@@ -1,23 +1,17 @@
 class SessionManager {
 
-
     constructor(){
-
         this.sessions = {};
-
     }
 
 
-
     createSession(map){
-
 
         const id =
         Math.random()
         .toString(36)
         .substring(2,8)
         .toUpperCase();
-
 
 
         this.sessions[id] = {
@@ -34,17 +28,16 @@ class SessionManager {
 
             messages:[],
 
+            level:[],
+
             starting:false
 
         };
 
 
-
         return this.sessions[id];
 
     }
-
-
 
 
     getSession(id){
@@ -54,10 +47,7 @@ class SessionManager {
     }
 
 
-
-
     joinSession(id,player){
-
 
         const session =
         this.sessions[id];
@@ -67,11 +57,9 @@ class SessionManager {
             return null;
 
 
-
         session.players.push(
             player
         );
-
 
 
         player.role = null;
@@ -79,135 +67,13 @@ class SessionManager {
         player.ready = false;
 
 
-
         return session;
 
     }
-
 
 
 
     changeRole(sessionId,socketId,role){
-
-
-    const session =
-    this.sessions[sessionId];
-
-
-    if(!session)
-        return null;
-
-
-
-    const player =
-    session.players.find(
-        p=>p.id === socketId
-    );
-
-
-
-    if(!player)
-        return null;
-
-
-
-    if(player.role === role)
-        return session;
-
-
-
-    if(role === "ilum"){
-
-
-        if(session.ilum && session.ilum.id !== socketId)
-            return null;
-
-
-    }
-
-
-
-    if(role === "employee"){
-
-
-        const employeeCount =
-        session.employees.filter(
-            p=>p.id !== socketId
-        ).length;
-
-
-
-        if(employeeCount >= 4)
-            return null;
-
-
-    }
-
-
-
-    // retirer ancien rôle
-
-
-    if(session.ilum?.id === socketId){
-
-        session.ilum = null;
-
-    }
-
-
-
-    session.employees =
-    session.employees.filter(
-        p=>p.id !== socketId
-    );
-
-
-
-    // appliquer nouveau rôle
-
-
-    player.role =
-    role;
-
-
-    player.ready =
-    false;
-
-
-
-    if(role === "ilum"){
-
-
-        session.ilum =
-        player;
-
-
-    }
-
-
-
-    if(role === "employee"){
-
-
-        session.employees.push(
-            player
-        );
-
-
-    }
-
-
-
-    return session;
-
-}
-
-
-
-
-
-    setReady(sessionId,socketId){
-
 
         const session =
         this.sessions[sessionId];
@@ -224,9 +90,76 @@ class SessionManager {
         );
 
 
+        if(!player)
+            return null;
 
-        if(player)
-            player.ready = true;
+
+
+        if(player.role === role)
+            return session;
+
+
+
+        if(role === "ilum"){
+
+            if(session.ilum && session.ilum.id !== socketId)
+                return null;
+
+        }
+
+
+
+        if(role === "employee"){
+
+            const count =
+            session.employees.filter(
+                p=>p.id !== socketId
+            ).length;
+
+
+            if(count >= 4)
+                return null;
+
+        }
+
+
+
+        if(session.ilum?.id === socketId){
+
+            session.ilum = null;
+
+        }
+
+
+
+        session.employees =
+        session.employees.filter(
+            p=>p.id !== socketId
+        );
+
+
+
+        player.role = role;
+
+        player.ready = false;
+
+
+
+        if(role === "ilum"){
+
+            session.ilum = player;
+
+        }
+
+
+
+        if(role === "employee"){
+
+            session.employees.push(
+                player
+            );
+
+        }
 
 
 
@@ -236,34 +169,52 @@ class SessionManager {
 
 
 
-
-
-    allReady(sessionId){
-
+    setReady(sessionId,socketId){
 
         const session =
         this.sessions[sessionId];
 
+
+        if(!session)
+            return null;
+
+
+        const player =
+        session.players.find(
+            p=>p.id === socketId
+        );
+
+
+        if(player)
+            player.ready = true;
+
+
+        return session;
+
+    }
+
+
+
+    allReady(sessionId){
+
+        const session =
+        this.sessions[sessionId];
 
 
         if(!session)
             return false;
 
 
-
         if(!session.ilum)
             return false;
-
 
 
         if(session.employees.length === 0)
             return false;
 
 
-
         if(!session.ilum.ready)
             return false;
-
 
 
         return session.employees.every(
@@ -274,28 +225,21 @@ class SessionManager {
 
 
 
-
-
     setStarting(sessionId){
-
 
         const session =
         this.sessions[sessionId];
-
 
 
         if(!session)
             return null;
 
 
-
         if(session.starting)
             return null;
 
 
-
         session.starting = true;
-
 
 
         return session;
@@ -304,19 +248,33 @@ class SessionManager {
 
 
 
-
-
-    addMessage(id,message){
-
+    saveLevel(sessionId,level){
 
         const session =
-        this.sessions[id];
-
+        this.sessions[sessionId];
 
 
         if(!session)
             return null;
 
+
+        session.level = level;
+
+
+        return session;
+
+    }
+
+
+
+    addMessage(id,message){
+
+        const session =
+        this.sessions[id];
+
+
+        if(!session)
+            return null;
 
 
         session.messages.push(
@@ -324,10 +282,8 @@ class SessionManager {
         );
 
 
-
         if(session.messages.length > 50)
             session.messages.shift();
-
 
 
         return session.messages;
@@ -336,18 +292,13 @@ class SessionManager {
 
 
 
-
-
     removePlayer(socketId){
-
 
         for(const id in this.sessions){
 
 
-
             const session =
             this.sessions[id];
-
 
 
             const player =
@@ -356,9 +307,7 @@ class SessionManager {
             );
 
 
-
             if(player){
-
 
 
                 session.players =
@@ -387,7 +336,6 @@ class SessionManager {
 
                     delete this.sessions[id];
 
-
                     return null;
 
                 }
@@ -396,9 +344,7 @@ class SessionManager {
 
                 return session;
 
-
             }
-
 
         }
 
@@ -406,7 +352,6 @@ class SessionManager {
         return null;
 
     }
-
 
 }
 

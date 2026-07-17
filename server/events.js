@@ -1,30 +1,27 @@
 const EVENTS = {
 
-    CREATE_SESSION: "create_session",
+    CREATE_SESSION:"create_session",
+    JOIN_SESSION:"join_session",
 
-    JOIN_SESSION: "join_session",
+    SESSION_CREATED:"session_created",
+    SESSION_JOINED:"session_joined",
 
-    SESSION_CREATED: "session_created",
+    PLAYERS_UPDATED:"players_updated",
 
-    SESSION_JOINED: "session_joined",
+    CHANGE_ROLE:"change_role",
+    PLAYER_READY:"player_ready",
 
-    PLAYERS_UPDATED: "players_updated",
+    GAME_COUNTDOWN:"game_countdown",
 
-    CHANGE_ROLE: "change_role",
+    SAVE_LEVEL:"save_level",
 
-    PLAYER_READY: "player_ready",
+    START_GAME:"start_game",
+    GAME_STARTED:"game_started",
 
-    GAME_COUNTDOWN: "game_countdown",
+    CHAT_MESSAGE:"chat_message",
 
-    START_GAME: "start_game",
-
-    GAME_STARTED: "game_started",
-
-    CHAT_MESSAGE: "chat_message",
-
-    AVATAR_UPDATE: "avatar_update"
+    AVATAR_UPDATE:"avatar_update"
 
 };
-
 
 module.exports = EVENTS;
