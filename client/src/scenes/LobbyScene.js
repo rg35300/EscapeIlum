@@ -17,8 +17,6 @@ export default class LobbyScene extends Phaser.Scene {
 
         this.session = data.session;
 
-        this.messages = [];
-
     }
 
 
@@ -36,7 +34,6 @@ export default class LobbyScene extends Phaser.Scene {
 
         const height =
         this.scale.height;
-
 
 
 
@@ -81,11 +78,9 @@ export default class LobbyScene extends Phaser.Scene {
 
 
 
-
         // =========================
         // PLAYERS
         // =========================
-
 
 
         this.add.text(
@@ -104,14 +99,11 @@ export default class LobbyScene extends Phaser.Scene {
 
 
 
-
-
         this.playersContainer =
         this.add.container(
             width * 0.25,
             270
         );
-
 
 
 
@@ -130,13 +122,9 @@ export default class LobbyScene extends Phaser.Scene {
 
 
 
-
-
-
         // =========================
         // CHAT
         // =========================
-
 
 
 
@@ -157,7 +145,7 @@ export default class LobbyScene extends Phaser.Scene {
 
 
 
-        this.chatBackground =
+
         this.add.rectangle(
             width * 0.75,
             380,
@@ -168,43 +156,9 @@ export default class LobbyScene extends Phaser.Scene {
 
 
 
-        this.chatBackground.setDepth(
-            0
-        );
 
 
-
-
-
-
-
-
-        this.chatText =
-        this.add.text(
-            width * 0.75 - 200,
-            260,
-            "",
-            {
-                fontSize:"22px",
-                color:"#ffffff",
-                wordWrap:{
-                    width:390
-                }
-            }
-        );
-
-
-
-        this.chatText.setDepth(
-            5
-        );
-
-
-
-
-
-
-
+        this.createChatBox();
 
         this.createChatInput();
 
@@ -235,7 +189,6 @@ export default class LobbyScene extends Phaser.Scene {
 
 
 
-
         SocketManager.onChatMessage(
             (data)=>{
 
@@ -248,6 +201,26 @@ export default class LobbyScene extends Phaser.Scene {
             }
         );
 
+
+
+
+
+
+
+        this.events.once(
+            "shutdown",
+            ()=>{
+                this.removeHTML();
+            }
+        );
+
+
+        this.events.once(
+            "destroy",
+            ()=>{
+                this.removeHTML();
+            }
+        );
 
 
 
@@ -281,9 +254,9 @@ export default class LobbyScene extends Phaser.Scene {
 
 
 
-
         players.forEach(
             (player)=>{
+
 
 
 
@@ -304,6 +277,7 @@ export default class LobbyScene extends Phaser.Scene {
                     55,
                     55
                 );
+
 
 
 
@@ -345,13 +319,106 @@ export default class LobbyScene extends Phaser.Scene {
 
 
 
-
                 y += 75;
 
 
 
             }
         );
+
+
+
+    }
+
+
+
+
+
+
+
+
+
+
+
+
+    createChatBox(){
+
+
+
+        const chatBox =
+        document.createElement("div");
+
+
+
+        chatBox.style.position =
+        "absolute";
+
+
+
+        chatBox.style.left =
+        "calc(75% - 220px)";
+
+
+
+        chatBox.style.top =
+        "250px";
+
+
+
+        chatBox.style.width =
+        "430px";
+
+
+
+        chatBox.style.height =
+        "250px";
+
+
+
+        chatBox.style.background =
+        "#222";
+
+
+
+        chatBox.style.color =
+        "#fff";
+
+
+
+        chatBox.style.fontSize =
+        "20px";
+
+
+
+        chatBox.style.padding =
+        "10px";
+
+
+
+        chatBox.style.boxSizing =
+        "border-box";
+
+
+
+        chatBox.style.overflowY =
+        "auto";
+
+
+
+        chatBox.style.borderRadius =
+        "5px";
+
+
+
+        document.body.appendChild(
+            chatBox
+        );
+
+
+
+        this.chatBox =
+        chatBox;
+
 
 
     }
@@ -370,199 +437,174 @@ export default class LobbyScene extends Phaser.Scene {
     createChatInput(){
 
 
-    const input =
-    document.createElement("input");
 
+        const input =
+        document.createElement("input");
 
 
-    input.placeholder =
-    "Message...";
 
+        input.placeholder =
+        "Message...";
 
 
-    input.style.position =
-    "absolute";
 
+        input.style.position =
+        "absolute";
 
 
-    input.style.left =
-    "calc(75% - 220px)";
 
+        input.style.left =
+        "calc(75% - 220px)";
 
 
-    input.style.top =
-    "500px";
 
+        input.style.top =
+        "110px";
 
 
-    input.style.width =
-    "300px";
 
+        input.style.width =
+        "320px";
 
 
-    input.style.height =
-    "35px";
 
+        input.style.height =
+        "35px";
 
 
-    input.style.fontSize =
-    "18px";
 
+        input.style.fontSize =
+        "18px";
 
 
-    input.style.padding =
-    "5px";
 
-
-
-    input.style.borderRadius =
-    "5px";
-
-
-
-    input.style.boxSizing =
-    "border-box";
-
-
-
-    document.body.appendChild(
-        input
-    );
-
-
-
-
-
-
-
-
-    const button =
-    document.createElement("button");
-
-
-
-    button.innerText =
-    "SEND";
-
-
-
-    button.style.position =
-    "absolute";
-
-
-
-    button.style.left =
-    "calc(75% + 85px)";
-
-
-
-    button.style.top =
-    "500px";
-
-
-
-    button.style.width =
-    "75px";
-
-
-
-    button.style.height =
-    "35px";
-
-
-
-    button.style.fontSize =
-    "18px";
-
-
-
-    button.style.cursor =
-    "pointer";
-
-
-
-    button.style.borderRadius =
-    "5px";
-
-
-
-    document.body.appendChild(
-        button
-    );
-
-
-
-
-
-
-
-
-
-    const sendMessage =
-    ()=>{
-
-
-        const message =
-        input.value.trim();
-
-
-
-        if(
-            message === ""
-        )
-            return;
-
-
-
-
-
-        SocketManager.sendChatMessage(
-            message
+        document.body.appendChild(
+            input
         );
 
 
 
-        input.value = "";
-
-
-
-    };
 
 
 
 
 
 
-
-
-    button.onclick =
-    sendMessage;
-
+        const button =
+        document.createElement("button");
 
 
 
+        button.innerText =
+        "SEND";
+
+
+
+        button.style.position =
+        "absolute";
+
+
+
+        button.style.left =
+        "calc(75% + 105px)";
+
+
+
+        button.style.top =
+        "110px";
+
+
+
+        button.style.width =
+        "75px";
+
+
+
+        button.style.height =
+        "35px";
+
+
+
+        button.style.cursor =
+        "pointer";
+
+
+
+        document.body.appendChild(
+            button
+        );
 
 
 
 
-    input.addEventListener(
-        "keydown",
-        (event)=>{
+
+
+
+
+
+        const sendMessage =
+        ()=>{
+
+
+
+            const message =
+            input.value.trim();
+
 
 
             if(
-                event.key === "Enter"
-            ){
+                message === ""
+            )
+                return;
 
 
-                sendMessage();
+
+
+
+            SocketManager.sendChatMessage(
+                message
+            );
+
+
+
+            input.value = "";
+
+
+
+        };
+
+
+
+
+
+
+
+        button.onclick =
+        sendMessage;
+
+
+
+
+
+
+        input.addEventListener(
+            "keydown",
+            (event)=>{
+
+
+                if(
+                    event.key === "Enter"
+                ){
+
+
+                    sendMessage();
+
+
+                }
 
 
             }
-
-
-        }
-    );
+        );
 
 
 
@@ -570,18 +612,16 @@ export default class LobbyScene extends Phaser.Scene {
 
 
 
-
-    this.chatInput =
-    input;
-
+        this.chatInput =
+        input;
 
 
-    this.chatButton =
-    button;
+        this.chatButton =
+        button;
 
 
 
-}
+    }
 
 
 
@@ -599,40 +639,23 @@ export default class LobbyScene extends Phaser.Scene {
 
 
         const line =
+        document.createElement("div");
+
+
+
+        line.innerText =
         data.name + " : " + data.message;
 
 
 
-
-
-        this.messages.push(
+        this.chatBox.appendChild(
             line
         );
 
 
 
-
-
-
-
-        if(
-            this.messages.length > 10
-        ){
-
-            this.messages.shift();
-
-        }
-
-
-
-
-
-
-
-
-        this.chatText.setText(
-            this.messages.join("\n")
-        );
+        this.chatBox.scrollTop =
+        this.chatBox.scrollHeight;
 
 
 
@@ -646,7 +669,12 @@ export default class LobbyScene extends Phaser.Scene {
 
 
 
-    shutdown(){
+    removeHTML(){
+
+
+
+        if(this.chatBox)
+            this.chatBox.remove();
 
 
 
