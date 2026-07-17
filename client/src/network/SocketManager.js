@@ -11,6 +11,7 @@ class SocketManager {
     }
 
 
+
     connect(){
 
         if(this.socket)
@@ -26,7 +27,7 @@ class SocketManager {
             ()=>{
 
                 console.log(
-                    "Connecté au serveur :",
+                    "Connecté :",
                     this.socket.id
                 );
 
@@ -34,6 +35,8 @@ class SocketManager {
         );
 
     }
+
+
 
 
 
@@ -48,6 +51,8 @@ class SocketManager {
 
 
 
+
+
     onSessionCreated(callback){
 
         this.socket.on(
@@ -56,6 +61,8 @@ class SocketManager {
         );
 
     }
+
+
 
 
 
@@ -70,6 +77,8 @@ class SocketManager {
 
 
 
+
+
     onSessionJoined(callback){
 
         this.socket.on(
@@ -78,6 +87,8 @@ class SocketManager {
         );
 
     }
+
+
 
 
 
@@ -92,6 +103,23 @@ class SocketManager {
 
 
 
+
+
+    changeRole(role){
+
+        this.socket.emit(
+            "change_role",
+            {
+                role:role
+            }
+        );
+
+    }
+
+
+
+
+
     playerReady(){
 
         this.socket.emit(
@@ -99,6 +127,21 @@ class SocketManager {
         );
 
     }
+
+
+
+
+
+    onGameCountdown(callback){
+
+        this.socket.on(
+            "game_countdown",
+            callback
+        );
+
+    }
+
+
 
 
 
@@ -113,6 +156,8 @@ class SocketManager {
 
 
 
+
+
     sendChatMessage(message){
 
         this.socket.emit(
@@ -121,6 +166,8 @@ class SocketManager {
         );
 
     }
+
+
 
 
 

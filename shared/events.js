@@ -1,31 +1,30 @@
-export const EVENTS = {
+const EVENTS = {
 
+    CREATE_SESSION:"create_session",
 
-    CREATE_SESSION: "create_session",
+    JOIN_SESSION:"join_session",
 
+    SESSION_CREATED:"session_created",
 
-    JOIN_SESSION: "join_session",
+    SESSION_JOINED:"session_joined",
 
+    PLAYERS_UPDATED:"players_updated",
 
-    SESSION_CREATED: "session_created",
+    PLAYER_READY:"player_ready",
 
+    CHANGE_ROLE:"change_role",
 
-    SESSION_JOINED: "session_joined",
+    GAME_COUNTDOWN:"game_countdown",
 
+    START_GAME:"start_game",
 
-    PLAYERS_UPDATED: "players_updated",
+    GAME_STARTED:"game_started",
 
+    CHAT_MESSAGE:"chat_message",
 
-    START_GAME: "start_game",
-
-
-    GAME_STARTED: "game_started",
-
-
-    CHAT_MESSAGE: "chat_message",
-
-
-    AVATAR_UPDATE: "avatar_update"
-
+    AVATAR_UPDATE:"avatar_update"
 
 };
+
+
+module.exports = EVENTS;

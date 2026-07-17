@@ -11,11 +11,17 @@ export default class LobbyScene extends Phaser.Scene {
     }
 
 
+
     init(data){
 
-        this.session = data.session;
+        this.session =
+        data.session;
+
+        this.localReady =
+        false;
 
     }
+
 
 
     create(){
@@ -23,6 +29,10 @@ export default class LobbyScene extends Phaser.Scene {
 
         const width =
         this.scale.width;
+
+
+        const height =
+        this.scale.height;
 
 
 
@@ -52,14 +62,15 @@ export default class LobbyScene extends Phaser.Scene {
 
 
 
-        // ILUM
+        // TITRES GAUCHE
+
 
         this.add.text(
             width * 0.25,
-            180,
-            "ILUM",
+            170,
+            "ROLES",
             {
-                fontSize:"32px",
+                fontSize:"35px",
                 color:"#ffffff"
             }
         )
@@ -67,39 +78,49 @@ export default class LobbyScene extends Phaser.Scene {
 
 
 
-        this.ilumBackground =
+        // ZONE ILUM
+
+
         this.add.rectangle(
             width * 0.25,
-            290,
-            350,
-            180,
+            270,
+            400,
+            150,
             0xd8b4ff
         );
+
+
+
+        this.add.text(
+            width * 0.25,
+            220,
+            "ILUM",
+            {
+                fontSize:"30px",
+                color:"#000000"
+            }
+        )
+        .setOrigin(0.5);
 
 
 
         this.ilumContainer =
         this.add.container(
             width * 0.25,
-            270
+            280
         );
 
 
 
-        this.drawIlum(
-            this.session.ilum
-        );
+        // ZONE EMPLOYEES
 
-
-
-        // EMPLOYEES
 
         this.add.text(
             width * 0.25,
-            420,
+            390,
             "EMPLOYEES",
             {
-                fontSize:"32px",
+                fontSize:"30px",
                 color:"#ffffff"
             }
         )
@@ -110,60 +131,49 @@ export default class LobbyScene extends Phaser.Scene {
         this.employeesContainer =
         this.add.container(
             width * 0.25,
-            480
+            470
         );
 
 
 
-        this.drawEmployees(
-            this.session.employees
-        );
+        this.drawPlayers();
+
+
+
+        // BOUTONS ROLE
+
+
+        this.createRoleButtons();
 
 
 
         this.createReadyButton();
 
 
-        this.createStartButton();
+
+        // COMPTE A REBOURS
+
+
+        SocketManager.onGameCountdown(
+            (time)=>{
+
+
+                if(this.countdownText)
+                    this.countdownText.destroy();
 
 
 
-        // CHAT
-
-        this.add.text(
-            width * 0.75,
-            210,
-            "Chat",
-            {
-                fontSize:"32px",
-                color:"#ffffff"
-            }
-        )
-        .setOrigin(0.5);
-
-
-
-        this.createChatBox();
-
-        this.createChatInput();
-
-
-
-        SocketManager.onPlayersUpdated(
-            (session)=>{
-
-
-                this.session = session;
-
-
-                this.drawIlum(
-                    session.ilum
-                );
-
-
-                this.drawEmployees(
-                    session.employees
-                );
+                this.countdownText =
+                this.add.text(
+                    width / 2,
+                    height - 80,
+                    "START IN " + time,
+                    {
+                        fontSize:"45px",
+                        color:"#ff0000"
+                    }
+                )
+                .setOrigin(0.5);
 
 
             }
@@ -175,9 +185,17 @@ export default class LobbyScene extends Phaser.Scene {
             (session)=>{
 
 
+                const me =
+                session.players.find(
+                    p=>p.id === SocketManager.socket.id
+                );
+
+
+
                 if(
-                    session.ilum.id === SocketManager.socket.id
+                    me.role === "ilum"
                 ){
+
 
                     this.scene.start(
                         "IlumScene",
@@ -198,6 +216,7 @@ export default class LobbyScene extends Phaser.Scene {
                         }
                     );
 
+
                 }
 
 
@@ -206,15 +225,41 @@ export default class LobbyScene extends Phaser.Scene {
 
 
 
-        SocketManager.onChatMessage(
-            (data)=>{
+        SocketManager.onPlayersUpdated(
+            (session)=>{
 
-                this.addMessage(
-                    data
-                );
+
+                this.session =
+                session;
+
+
+                this.drawPlayers();
+
 
             }
         );
+
+
+
+        // CHAT
+
+
+        this.add.text(
+            width * 0.75,
+            210,
+            "Chat",
+            {
+                fontSize:"32px",
+                color:"#ffffff"
+            }
+        )
+        .setOrigin(0.5);
+
+
+
+        this.createChatBox();
+
+        this.createChatInput();
 
 
 
@@ -240,7 +285,7 @@ export default class LobbyScene extends Phaser.Scene {
 
     }
 
-    drawIlum(player){
+    drawPlayers(){
 
 
         this.ilumContainer.removeAll(
@@ -248,85 +293,87 @@ export default class LobbyScene extends Phaser.Scene {
         );
 
 
-        if(!player)
-            return;
-
-
-
-        const avatar =
-        this.add.image(
-            -120,
-            0,
-            player.avatar || "SAMOYED_1"
-        );
-
-
-        avatar.setDisplaySize(
-            60,
-            60
-        );
-
-
-
-        const name =
-        this.add.text(
-            -50,
-            0,
-            player.name || "Ilum",
-            {
-                fontSize:"26px",
-                color:"#000000"
-            }
-        )
-        .setOrigin(
-            0,
-            0.5
-        );
-
-
-
-        const ready =
-        this.add.text(
-            100,
-            0,
-            player.ready ? "READY" : "WAIT",
-            {
-                fontSize:"22px",
-                color:"#000000"
-            }
-        )
-        .setOrigin(
-            0,
-            0.5
-        );
-
-
-
-        this.ilumContainer.add([
-            avatar,
-            name,
-            ready
-        ]);
-
-    }
-
-
-
-
-
-    drawEmployees(players){
-
-
         this.employeesContainer.removeAll(
             true
         );
+
+
+
+        const ilum =
+        this.session.ilum;
+
+
+
+        if(ilum){
+
+
+            const avatar =
+            this.add.image(
+                -120,
+                0,
+                ilum.avatar || "SAMOYED_1"
+            );
+
+
+            avatar.setDisplaySize(
+                60,
+                60
+            );
+
+
+
+            const name =
+            this.add.text(
+                -50,
+                0,
+                ilum.name,
+                {
+                    fontSize:"26px",
+                    color:"#000000"
+                }
+            )
+            .setOrigin(
+                0,
+                0.5
+            );
+
+
+
+            const ready =
+            this.add.text(
+                120,
+                0,
+                ilum.ready
+                ? "READY"
+                : "WAIT",
+                {
+                    fontSize:"22px",
+                    color:"#000000"
+                }
+            )
+            .setOrigin(
+                0,
+                0.5
+            );
+
+
+
+            this.ilumContainer.add([
+                avatar,
+                name,
+                ready
+            ]);
+
+
+        }
+
 
 
         let y = 0;
 
 
 
-        players.forEach(
+        this.session.employees.forEach(
             (player)=>{
 
 
@@ -347,9 +394,9 @@ export default class LobbyScene extends Phaser.Scene {
 
                 const name =
                 this.add.text(
-                    -60,
+                    -50,
                     y,
-                    player.name || "Employee",
+                    player.name,
                     {
                         fontSize:"24px",
                         color:"#ffffff"
@@ -364,9 +411,11 @@ export default class LobbyScene extends Phaser.Scene {
 
                 const ready =
                 this.add.text(
-                    120,
+                    130,
                     y,
-                    player.ready ? "READY" : "WAIT",
+                    player.ready
+                    ? "READY"
+                    : "WAIT",
                     {
                         fontSize:"20px",
                         color:"#00ff00"
@@ -400,19 +449,102 @@ export default class LobbyScene extends Phaser.Scene {
 
 
 
+    createRoleButtons(){
+
+
+
+        const width =
+        this.scale.width;
+
+
+
+        this.ilumButton =
+        this.add.text(
+            width * 0.12,
+            620,
+            "DEVENIR ILUM",
+            {
+                fontSize:"22px",
+                backgroundColor:"#aa66ff",
+                padding:{
+                    x:15,
+                    y:10
+                },
+                color:"#000000"
+            }
+        )
+        .setOrigin(0.5)
+        .setInteractive();
+
+
+
+        this.employeeButton =
+        this.add.text(
+            width * 0.38,
+            620,
+            "DEVENIR EMPLOYEE",
+            {
+                fontSize:"22px",
+                backgroundColor:"#555555",
+                padding:{
+                    x:15,
+                    y:10
+                }
+            }
+        )
+        .setOrigin(0.5)
+        .setInteractive();
+
+
+
+        this.ilumButton.on(
+            "pointerdown",
+            ()=>{
+
+
+                SocketManager.changeRole(
+                    "ilum"
+                );
+
+
+            }
+        );
+
+
+
+        this.employeeButton.on(
+            "pointerdown",
+            ()=>{
+
+
+                SocketManager.changeRole(
+                    "employee"
+                );
+
+
+            }
+        );
+
+
+    }
+
+
+
+
+
     createReadyButton(){
 
 
         this.readyButton =
         this.add.text(
-            this.scale.width * 0.25,
-            this.scale.height - 80,
+            this.scale.width / 2,
+            this.scale.height - 40,
             "READY",
             {
                 fontSize:"30px",
                 backgroundColor:"#008800",
                 padding:{
-                    x:20,
+                    x:25,
                     y:10
                 }
             }
@@ -427,7 +559,17 @@ export default class LobbyScene extends Phaser.Scene {
             ()=>{
 
 
+                if(this.localReady)
+                    return;
+
+
+
                 SocketManager.playerReady();
+
+
+                this.localReady =
+                true;
+
 
 
                 this.readyButton.setText(
@@ -440,56 +582,6 @@ export default class LobbyScene extends Phaser.Scene {
 
 
     }
-
-
-
-
-
-    createStartButton(){
-
-
-        this.startButton =
-        this.add.text(
-            this.scale.width / 2,
-            this.scale.height - 40,
-            "START GAME",
-            {
-                fontSize:"35px",
-                backgroundColor:"#0055ff",
-                padding:{
-                    x:25,
-                    y:10
-                }
-            }
-        )
-        .setOrigin(0.5)
-        .setInteractive();
-
-
-
-        this.startButton.setVisible(
-            false
-        );
-
-
-
-        this.startButton.on(
-            "pointerdown",
-            ()=>{
-
-
-                SocketManager.playerReady();
-
-
-            }
-        );
-
-
-    }
-
-
-
-
 
     createChatBox(){
 
@@ -542,6 +634,7 @@ export default class LobbyScene extends Phaser.Scene {
         "auto";
 
 
+
         document.body.appendChild(
             chatBox
         );
@@ -588,6 +681,11 @@ export default class LobbyScene extends Phaser.Scene {
         "35px";
 
 
+        input.style.fontSize =
+        "18px";
+
+
+
         document.body.appendChild(
             input
         );
@@ -614,12 +712,13 @@ export default class LobbyScene extends Phaser.Scene {
         "520px";
 
 
+        button.style.width =
+        "90px";
+
+
         button.style.height =
         "35px";
 
-
-        button.style.width =
-        "90px";
 
 
         document.body.appendChild(
@@ -636,8 +735,10 @@ export default class LobbyScene extends Phaser.Scene {
             input.value.trim();
 
 
+
             if(message === "")
                 return;
+
 
 
             SocketManager.sendChatMessage(
@@ -645,7 +746,9 @@ export default class LobbyScene extends Phaser.Scene {
             );
 
 
+
             input.value = "";
+
 
         };
 
@@ -695,9 +798,11 @@ export default class LobbyScene extends Phaser.Scene {
         data.name + " : " + data.message;
 
 
+
         this.chatBox.appendChild(
             line
         );
+
 
 
         this.chatBox.scrollTop =
@@ -717,8 +822,10 @@ export default class LobbyScene extends Phaser.Scene {
             this.chatBox.remove();
 
 
+
         if(this.chatInput)
             this.chatInput.remove();
+
 
 
         if(this.chatButton)

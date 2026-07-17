@@ -6,24 +6,33 @@ const { Server } = require("socket.io");
 const SessionManager = require("./SessionManager");
 const EVENTS = require("./events");
 
+
 const app = express();
 
 app.use(cors());
 
-const server = http.createServer(app);
 
-const io = new Server(server,{
+const server =
+http.createServer(app);
+
+
+const io =
+new Server(server,{
     cors:{
         origin:"*"
     }
 });
 
-const sessions = new SessionManager();
+
+const sessions =
+new SessionManager();
+
 
 
 io.on(
 "connection",
 (socket)=>{
+
 
     console.log(
         "Connexion :",
@@ -31,313 +40,448 @@ io.on(
     );
 
 
-    // CREATION SESSION
 
     socket.on(
-    EVENTS.CREATE_SESSION,
-    (data)=>{
-
-        const session =
-        sessions.createSession(
-            data.map
-        );
+        EVENTS.CREATE_SESSION,
+        (data)=>{
 
 
-        const player = {
-
-            id:socket.id,
-
-            name:
-            data.name || "Player",
-
-            avatar:
-            data.avatar || "SAMOYED_1",
-
-            x:5,
-
-            y:5
-
-        };
-
-
-        sessions.joinSession(
-            session.id,
-            player
-        );
-
-
-        socket.join(
-            session.id
-        );
-
-
-        socket.emit(
-            EVENTS.SESSION_CREATED,
-            session
-        );
-
-
-        console.log(
-            "Session créée :",
-            session.id
-        );
-
-    });
-
-
-    // REJOINDRE SESSION
-
-    socket.on(
-    EVENTS.JOIN_SESSION,
-    (data)=>{
-
-
-        const player = {
-
-            id:socket.id,
-
-            name:
-            data.name || "Player",
-
-            avatar:
-            data.avatar || "SAMOYED_1",
-
-            x:5,
-
-            y:5
-
-        };
-
-
-        const session =
-        sessions.joinSession(
-            data.sessionId,
-            player
-        );
-
-
-        if(!session){
-
-            socket.emit(
-                "join_error",
-                "Session invalide ou complète"
+            const session =
+            sessions.createSession(
+                data.map
             );
 
-            return;
-
-        }
 
 
-        socket.join(
-            session.id
-        );
+            const player = {
 
+                id:socket.id,
 
-        socket.emit(
-            EVENTS.SESSION_JOINED,
-            session
-        );
+                name:
+                data.name || "Player",
 
+                avatar:
+                data.avatar || "SAMOYED_1",
 
-        io.to(
-            session.id
-        )
-        .emit(
-            EVENTS.PLAYERS_UPDATED,
-            session
-        );
+                role:null,
 
+                ready:false
 
-        console.log(
-            player.name,
-            "a rejoint",
-            session.id
-        );
-
-
-    });
+            };
 
 
 
-    // READY
-
-    socket.on(
-    EVENTS.PLAYER_READY,
-    ()=>{
-
-
-        const rooms =
-        Array.from(
-            socket.rooms
-        );
-
-
-        const sessionId =
-        rooms.find(
-            room=>room !== socket.id
-        );
-
-
-        if(!sessionId)
-            return;
+            session.players.push(
+                player
+            );
 
 
 
-        const session =
-        sessions.setReady(
-            sessionId,
-            socket.id
-        );
-
-
-        if(!session)
-            return;
+            socket.join(
+                session.id
+            );
 
 
 
-        io.to(
-            sessionId
-        )
-        .emit(
-            EVENTS.PLAYERS_UPDATED,
-            session
-        );
-
-
-
-        if(
-            sessions.allReady(
-                sessionId
-            )
-        ){
-
-            io.to(
-                sessionId
-            )
-            .emit(
-                EVENTS.START_GAME,
+            socket.emit(
+                EVENTS.SESSION_CREATED,
                 session
             );
 
+
+            socket.emit(
+                EVENTS.PLAYERS_UPDATED,
+                session
+            );
+
+
+
+            console.log(
+                "Session créée :",
+                session.id
+            );
+
+
         }
-
-
-    });
-
+    );
 
 
 
 
-    // CHAT
 
     socket.on(
-    EVENTS.CHAT_MESSAGE,
-    (message)=>{
+        EVENTS.JOIN_SESSION,
+        (data)=>{
 
 
-        const rooms =
-        Array.from(
-            socket.rooms
-        );
+            const player = {
 
+                id:socket.id,
 
-        const sessionId =
-        rooms.find(
-            room=>room !== socket.id
-        );
+                name:
+                data.name || "Player",
 
+                avatar:
+                data.avatar || "SAMOYED_1",
 
-        if(!sessionId)
-            return;
+                role:null,
 
+                ready:false
 
-
-        const session =
-        sessions.getSession(
-            sessionId
-        );
-
-
-        if(!session)
-            return;
+            };
 
 
 
-        const player =
-        session.players.find(
-            p=>p.id === socket.id
-        );
-
-
-        const chatMessage = {
-
-            name:
-            player
-            ? player.name
-            : "Player",
-
-            message:message
-
-        };
-
-
-        io.to(
-            sessionId
-        )
-        .emit(
-            EVENTS.CHAT_MESSAGE,
-            chatMessage
-        );
-
-
-    });
+            const session =
+            sessions.joinSession(
+                data.sessionId,
+                player
+            );
 
 
 
+            if(!session){
 
 
-    // DECONNEXION
-
-    socket.on(
-    "disconnect",
-    ()=>{
-
-
-        console.log(
-            "Déconnexion :",
-            socket.id
-        );
+                socket.emit(
+                    "join_error",
+                    "Code invalide"
+                );
 
 
-        const result =
-        sessions.removePlayer(
-            socket.id
-        );
+                return;
 
 
-        if(!result)
-            return;
+            }
 
 
 
-        if(result.session){
+            socket.join(
+                session.id
+            );
+
+
+
+            socket.emit(
+                EVENTS.SESSION_JOINED,
+                session
+            );
+
 
 
             io.to(
-                result.session.id
+                session.id
             )
             .emit(
                 EVENTS.PLAYERS_UPDATED,
-                result.session
+                session
             );
 
+
+
+            console.log(
+                player.name,
+                "a rejoint",
+                session.id
+            );
+
+
         }
+    );
 
 
-    });
+
+
+
+    socket.on(
+        EVENTS.CHANGE_ROLE,
+        (data)=>{
+
+
+            const rooms =
+            Array.from(
+                socket.rooms
+            );
+
+
+
+            const sessionId =
+            rooms.find(
+                room=>room !== socket.id
+            );
+
+
+
+            if(!sessionId)
+                return;
+
+
+
+            const session =
+            sessions.changeRole(
+                sessionId,
+                socket.id,
+                data.role
+            );
+
+
+
+            if(!session)
+                return;
+
+
+
+            io.to(
+                sessionId
+            )
+            .emit(
+                EVENTS.PLAYERS_UPDATED,
+                session
+            );
+
+
+        }
+    );
+
+
+
+
+
+    socket.on(
+        EVENTS.PLAYER_READY,
+        ()=>{
+
+
+            const rooms =
+            Array.from(
+                socket.rooms
+            );
+
+
+
+            const sessionId =
+            rooms.find(
+                room=>room !== socket.id
+            );
+
+
+
+            if(!sessionId)
+                return;
+
+
+
+            const session =
+            sessions.setReady(
+                sessionId,
+                socket.id
+            );
+
+
+
+            if(!session)
+                return;
+
+
+
+            io.to(
+                sessionId
+            )
+            .emit(
+                EVENTS.PLAYERS_UPDATED,
+                session
+            );
+
+
+
+            if(
+                sessions.allReady(
+                    sessionId
+                )
+            ){
+
+
+                const game =
+                sessions.setStarting(
+                    sessionId
+                );
+
+
+
+                if(!game)
+                    return;
+
+
+
+                let count = 5;
+
+
+
+                const timer =
+                setInterval(
+                ()=>{
+
+
+                    io.to(
+                        sessionId
+                    )
+                    .emit(
+                        EVENTS.GAME_COUNTDOWN,
+                        count
+                    );
+
+
+
+                    count--;
+
+
+
+                    if(count < 0){
+
+
+                        clearInterval(
+                            timer
+                        );
+
+
+
+                        io.to(
+                            sessionId
+                        )
+                        .emit(
+                            EVENTS.START_GAME,
+                            session
+                        );
+
+
+                    }
+
+
+                },
+                1000
+                );
+
+
+            }
+
+
+        }
+    );
+
+
+
+
+
+    socket.on(
+        EVENTS.CHAT_MESSAGE,
+        (message)=>{
+
+
+            const rooms =
+            Array.from(
+                socket.rooms
+            );
+
+
+
+            const sessionId =
+            rooms.find(
+                room=>room !== socket.id
+            );
+
+
+
+            if(!sessionId)
+                return;
+
+
+
+            const session =
+            sessions.getSession(
+                sessionId
+            );
+
+
+
+            if(!session)
+                return;
+
+
+
+            const player =
+            session.players.find(
+                p=>p.id === socket.id
+            );
+
+
+
+            io.to(
+                sessionId
+            )
+            .emit(
+                EVENTS.CHAT_MESSAGE,
+                {
+
+                    name:
+                    player
+                    ? player.name
+                    : "Player",
+
+
+                    message:message
+
+                }
+            );
+
+
+        }
+    );
+
+
+
+
+
+    socket.on(
+        "disconnect",
+        ()=>{
+
+
+            console.log(
+                "Déconnexion :",
+                socket.id
+            );
+
+
+
+            const session =
+            sessions.removePlayer(
+                socket.id
+            );
+
+
+
+            if(session){
+
+
+                io.to(
+                    session.id
+                )
+                .emit(
+                    EVENTS.PLAYERS_UPDATED,
+                    session
+                );
+
+
+            }
+
+
+        }
+    );
 
 
 });
+
+
 
 
 
@@ -345,14 +489,17 @@ const PORT =
 process.env.PORT || 3000;
 
 
+
 server.listen(
 PORT,
 "0.0.0.0",
 ()=>{
 
+
     console.log(
         "Serveur EscapeIlum lancé sur le port",
         PORT
     );
+
 
 });
