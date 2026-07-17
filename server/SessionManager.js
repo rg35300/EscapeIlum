@@ -1,6 +1,5 @@
 class SessionManager {
 
-
     constructor(){
 
         this.sessions = {};
@@ -8,13 +7,7 @@ class SessionManager {
     }
 
 
-
-
-
-
-
     createSession(map){
-
 
         const id =
         Math.random()
@@ -23,77 +16,81 @@ class SessionManager {
         .toUpperCase();
 
 
-
-
-
         this.sessions[id] = {
-
 
             id:id,
 
-
             map:map,
-
 
             players:[],
 
+            ilum:null,
 
-            messages:[]
+            employees:[],
 
+            messages:[],
+
+            starting:false
 
         };
 
 
-
-
-
         return this.sessions[id];
 
-
     }
-
-
-
-
-
-
-
 
 
     getSession(id){
 
-
         return this.sessions[id];
-
 
     }
 
 
-
-
-
-
-
-
-
     joinSession(id, player){
-
-
 
         const session =
         this.sessions[id];
 
 
-
-        if(!session){
-
-
+        if(!session)
             return null;
 
 
+
+        if(!session.ilum){
+
+            player.role =
+            "ilum";
+
+            player.ready =
+            false;
+
+            session.ilum =
+            player;
+
+
+        } else {
+
+
+            if(session.employees.length >= 4)
+                return null;
+
+
+
+            player.role =
+            "employee";
+
+
+            player.ready =
+            false;
+
+
+            session.employees.push(
+                player
+            );
+
         }
-
-
 
 
 
@@ -102,36 +99,100 @@ class SessionManager {
         );
 
 
-
         return session;
-
 
     }
 
 
+    setReady(sessionId, socketId){
+
+        const session =
+        this.sessions[sessionId];
+
+
+        if(!session)
+            return null;
 
 
 
+        const player =
+        session.players.find(
+            p=>p.id === socketId
+        );
 
 
+
+        if(player){
+
+            player.ready =
+            true;
+
+        }
+
+
+
+        return session;
+
+    }
+
+
+    allReady(sessionId){
+
+        const session =
+        this.sessions[sessionId];
+
+
+        if(!session || !session.ilum)
+            return false;
+
+
+
+        if(!session.ilum.ready)
+            return false;
+
+
+
+        return session.employees.every(
+            player=>player.ready
+        );
+
+    }
+
+
+    setStarting(sessionId){
+
+        const session =
+        this.sessions[sessionId];
+
+
+        if(!session)
+            return null;
+
+
+
+        if(session.starting)
+            return null;
+
+
+
+        session.starting =
+        true;
+
+
+
+        return session;
+
+    }
 
 
     addMessage(id,message){
-
-
 
         const session =
         this.sessions[id];
 
 
-
-        if(!session){
-
+        if(!session)
             return null;
-
-        }
-
-
 
 
 
@@ -141,49 +202,24 @@ class SessionManager {
 
 
 
-
-
-        // limite historique
-
-        if(session.messages.length > 50){
-
-
+        if(session.messages.length > 50)
             session.messages.shift();
-
-
-        }
-
-
 
 
 
         return session.messages;
 
-
     }
 
 
-
-
-
-
-
-
-
     removePlayer(socketId){
-
-
 
         for(
             const id in this.sessions
         ){
 
-
-
             const session =
             this.sessions[id];
-
-
 
 
 
@@ -194,16 +230,11 @@ class SessionManager {
 
 
 
-
-
             if(index !== -1){
-
 
 
                 const player =
                 session.players[index];
-
-
 
 
 
@@ -214,16 +245,29 @@ class SessionManager {
 
 
 
+                if(player.role === "ilum"){
 
+
+                    session.ilum =
+                    null;
+
+
+                } else {
+
+
+                    session.employees =
+                    session.employees.filter(
+                        p=>p.id !== socketId
+                    );
+
+                }
 
 
 
                 if(session.players.length === 0){
 
 
-
                     delete this.sessions[id];
-
 
 
                     return {
@@ -234,46 +278,28 @@ class SessionManager {
 
                     };
 
-
                 }
-
-
-
-
-
 
 
 
                 return {
 
-
                     session:session,
 
                     player:player
 
-
                 };
 
 
-
             }
-
 
         }
 
 
 
-
-
-
-
         return null;
 
-
     }
-
-
-
 
 
 }
