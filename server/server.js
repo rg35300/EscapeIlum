@@ -255,22 +255,6 @@ io.on(
 
 
 
-
-
-            // Envoi historique chat
-
-            socket.emit(
-                EVENTS.CHAT_HISTORY,
-                session.messages
-            );
-
-
-
-
-
-
-
-
             console.log(
 
                 player.name,
