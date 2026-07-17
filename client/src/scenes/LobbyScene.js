@@ -25,7 +25,10 @@ export default class LobbyScene extends Phaser.Scene {
     create(){
 
 
-        const width = this.scale.width;
+        const width =
+        this.scale.width;
+
+
 
 
 
@@ -39,6 +42,8 @@ export default class LobbyScene extends Phaser.Scene {
             }
         )
         .setOrigin(0.5);
+
+
 
 
 
@@ -60,6 +65,7 @@ export default class LobbyScene extends Phaser.Scene {
 
 
 
+
         this.add.text(
             width * 0.25,
             220,
@@ -75,6 +81,8 @@ export default class LobbyScene extends Phaser.Scene {
 
 
 
+
+
         this.playersContainer =
         this.add.container(
             width * 0.25,
@@ -85,9 +93,12 @@ export default class LobbyScene extends Phaser.Scene {
 
 
 
+
+
         this.drawPlayers(
             this.session.players
         );
+
 
 
 
@@ -105,6 +116,7 @@ export default class LobbyScene extends Phaser.Scene {
             }
         )
         .setOrigin(0.5);
+
 
 
 
@@ -133,7 +145,9 @@ export default class LobbyScene extends Phaser.Scene {
 
 
 
+
     drawPlayers(players){
+
 
 
         this.playersContainer.removeAll(
@@ -146,8 +160,11 @@ export default class LobbyScene extends Phaser.Scene {
 
 
 
+
+
         players.forEach(
             (player)=>{
+
 
 
                 const avatar =
@@ -160,9 +177,10 @@ export default class LobbyScene extends Phaser.Scene {
 
 
                 avatar.setDisplaySize(
-                    70,
-                    70
+                    64,
+                    64
                 );
+
 
 
 
@@ -170,7 +188,7 @@ export default class LobbyScene extends Phaser.Scene {
 
                 const name =
                 this.add.text(
-                    -60,
+                    -50,
                     y,
                     player.name || "Player",
                     {
@@ -187,6 +205,7 @@ export default class LobbyScene extends Phaser.Scene {
 
 
 
+
                 this.playersContainer.add(
                     [
                         avatar,
@@ -196,7 +215,10 @@ export default class LobbyScene extends Phaser.Scene {
 
 
 
-                y += 100;
+
+
+                y += 80;
+
 
 
             }
