@@ -13,11 +13,13 @@ export default class LobbyScene extends Phaser.Scene {
 
 
 
+
     init(data){
 
         this.session = data.session;
 
     }
+
 
 
 
@@ -36,12 +38,17 @@ export default class LobbyScene extends Phaser.Scene {
 
 
 
+        this.avatarMasks = [];
+
+
+
+
 
 
 
         this.add.text(
-            width/2,
-            height*0.08,
+            width / 2,
+            height * 0.08,
             "LOBBY",
             {
                 fontSize:"50px",
@@ -58,8 +65,8 @@ export default class LobbyScene extends Phaser.Scene {
 
 
         this.add.text(
-            width/2,
-            height*0.18,
+            width / 2,
+            height * 0.18,
             "Session code : " + this.session.id,
             {
                 fontSize:"30px",
@@ -75,11 +82,31 @@ export default class LobbyScene extends Phaser.Scene {
 
 
 
+
+        this.add.text(
+            width * 0.25,
+            height * 0.28,
+            "Players",
+            {
+                fontSize:"32px",
+                color:"#ffffff"
+            }
+        )
+        .setOrigin(0.5);
+
+
+
+
+
+
+
         this.playersContainer =
         this.add.container(
-            width*0.25,
-            height*0.35
+            width * 0.25,
+            height * 0.38
         );
+
+
 
 
 
@@ -96,8 +123,8 @@ export default class LobbyScene extends Phaser.Scene {
 
 
         this.add.text(
-            width*0.75,
-            height*0.30,
+            width * 0.75,
+            height * 0.30,
             "Chat",
             {
                 fontSize:"32px",
@@ -128,8 +155,8 @@ export default class LobbyScene extends Phaser.Scene {
 
 
 
-
     }
+
 
 
 
@@ -141,9 +168,25 @@ export default class LobbyScene extends Phaser.Scene {
     drawPlayers(players){
 
 
+
         this.playersContainer.removeAll(
             true
         );
+
+
+
+        this.avatarMasks.forEach(
+            (mask)=>{
+
+                mask.destroy();
+
+            }
+        );
+
+
+
+        this.avatarMasks = [];
+
 
 
 
@@ -153,40 +196,68 @@ export default class LobbyScene extends Phaser.Scene {
 
 
 
+
         players.forEach(
             (player)=>{
 
 
 
+
+
                 const avatar =
-this.add.image(
-    -120,
-    y,
-    player.avatar || "SAMOYED_1"
-);
-
-
-avatar.setDisplaySize(
-    60,
-    60
-);
+                this.add.image(
+                    -120,
+                    y,
+                    player.avatar || "SAMOYED_1"
+                );
 
 
 
-const mask =
-this.make.graphics();
 
 
-mask.fillCircle(
-    -120,
-    y,
-    30
-);
+                avatar.setDisplaySize(
+                    60,
+                    60
+                );
 
 
-avatar.setMask(
-    mask.createGeometryMask()
-);
+
+
+
+
+
+                const mask =
+                this.make.graphics();
+
+
+
+                mask.fillStyle(
+                    0xffffff
+                );
+
+
+
+                mask.fillCircle(
+                    -120,
+                    y,
+                    30
+                );
+
+
+
+                avatar.setMask(
+                    mask.createGeometryMask()
+                );
+
+
+
+                this.avatarMasks.push(
+                    mask
+                );
+
+
+
+
 
 
 
@@ -211,12 +282,16 @@ avatar.setMask(
 
 
 
+
+
                 this.playersContainer.add(
                     [
                         avatar,
                         name
                     ]
                 );
+
+
 
 
 
@@ -229,6 +304,8 @@ avatar.setMask(
 
 
     }
+
+
 
 
 
