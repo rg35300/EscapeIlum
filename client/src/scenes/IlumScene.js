@@ -7,568 +7,479 @@ export default class IlumScene extends Phaser.Scene {
         super("IlumScene");
     }
 
-
     init(data){
 
         this.session = data.session;
 
+        this.energy = 1000;
+
         this.gridSize = 150;
-        this.cellSize = 8;
+        this.cellSize = 32;
 
-        this.mapWidth =
-        this.gridSize * this.cellSize;
-
-        this.mapHeight =
-        this.gridSize * this.cellSize;
+        this.mapX = 450;
+        this.mapY = 40;
 
         this.objects = [];
+        this.grid = [];
 
-        this.money = 1000;
+        this.draggingObject = null;
 
-        this.costs = {
-            wall:10,
-            enemy:100,
-            trap:25,
-            exit:0
+        this.items = {
+            wall:{
+                texture:"wall",
+                name:"Mur",
+                price:10,
+                blocked:true
+            },
+            enemy:{
+                texture:"enemy",
+                name:"Ennemi",
+                price:100,
+                blocked:false
+            },
+            latexPit:{
+                texture:"latexPit",
+                name:"Trou Latex",
+                price:50,
+                blocked:true
+            },
+            squeakIlum:{
+                texture:"squeakIlum",
+                name:"Squeak",
+                price:150,
+                blocked:false
+            },
+            gliderUp:{
+                texture:"gliderUp",
+                name:"Glider Haut",
+                price:75,
+                blocked:true
+            },
+            gliderDown:{
+                texture:"gliderDown",
+                name:"Glider Bas",
+                price:75,
+                blocked:true
+            },
+            gliderLeft:{
+                texture:"gliderLeft",
+                name:"Glider Gauche",
+                price:75,
+                blocked:true
+            },
+            gliderRight:{
+                texture:"gliderRight",
+                name:"Glider Droite",
+                price:75,
+                blocked:true
+            }
         };
-
-        this.dragObject = null;
 
     }
 
 
     create(){
 
-        const width =
-        this.scale.width;
+        for(let x=0;x<this.gridSize;x++){
+
+            this.grid[x]=[];
+
+            for(let y=0;y<this.gridSize;y++){
+                this.grid[x][y]=null;
+            }
+
+        }
+
+        this.createHUD();
+        this.createMap();
+        this.createMenu();
+        this.createCamera();
+
+    }
 
 
-        this.mapX =
-        width / 3 + 20;
+    createHUD(){
 
-        this.mapY =
-        40;
-
-
+        this.energyText =
         this.add.text(
-            width * 0.16,
-            40,
-            "ILUM - CREATION DU NIVEAU",
+            20,
+            20,
+            "⚡ Energie : "+this.energy,
             {
                 fontSize:"28px",
-                color:"#ffffff"
-            }
-        )
-        .setOrigin(0.5);
-
-
-
-        this.moneyText =
-        this.add.text(
-            width * 0.16,
-            90,
-            "ENERGIE : " + this.money,
-            {
-                fontSize:"24px",
                 color:"#ffff00"
             }
         )
-        .setOrigin(0.5);
+        .setScrollFactor(0);
 
 
-
-        this.createMenu();
-
-        this.createMap();
-
-        this.createStartButton();
-
-        this.setupCamera();
-
-    }
-
-
-
-    createMenu(){
-
-        const menuWidth =
-        this.scale.width / 3;
-
-
-        this.add.rectangle(
-            menuWidth/2,
-            this.scale.height/2,
-            menuWidth,
-            this.scale.height,
-            0x222222
-        );
-
-
-
+        this.validateButton =
         this.add.text(
-            menuWidth/2,
-            140,
-            "ELEMENTS",
+            20,
+            650,
+            "VALIDER",
             {
-                fontSize:"32px",
-                color:"#ffffff"
-            }
-        )
-        .setOrigin(0.5);
-
-
-
-        this.createElementButton(
-            "MUR - 10",
-            220,
-            0x884444,
-            "wall"
-        );
-
-
-        this.createElementButton(
-            "ENNEMI - 100",
-            300,
-            0xff0000,
-            "enemy"
-        );
-
-
-        this.createElementButton(
-            "PIEGE - 25",
-            380,
-            0xffff00,
-            "trap"
-        );
-
-
-        this.createElementButton(
-            "SORTIE",
-            460,
-            0x00ff00,
-            "exit"
-        );
-
-    }
-
-
-
-    createElementButton(text,y,color,type){
-
-        const button =
-        this.add.rectangle(
-            this.scale.width/6,
-            y,
-            220,
-            50,
-            color
-        )
-        .setInteractive();
-
-
-
-        this.add.text(
-            this.scale.width/6,
-            y,
-            text,
-            {
-                fontSize:"20px",
-                color:"#000000"
-            }
-        )
-        .setOrigin(0.5);
-
-
-
-        button.on(
-            "pointerdown",
-            ()=>{
-
-
-                if(this.dragObject)
-                    this.dragObject.destroy();
-
-
-
-                this.dragObject =
-                this.add.rectangle(
-                    this.input.x,
-                    this.input.y,
-                    this.cellSize,
-                    this.cellSize,
-                    color
-                );
-
-
-                this.dragObject.type =
-                type;
-
-
-                this.dragObject.setDepth(
-                    10
-                );
-
-
-            }
-        );
-
-    }
-
-
-
-    createMap(){
-
-        this.grid =
-        this.add.graphics();
-
-
-
-        this.grid.lineStyle(
-            1,
-            0x444444
-        );
-
-
-
-        for(
-            let x=0;
-            x<=this.gridSize;
-            x++
-        ){
-
-            this.grid.lineBetween(
-                this.mapX + x*this.cellSize,
-                this.mapY,
-                this.mapX + x*this.cellSize,
-                this.mapY + this.mapHeight
-            );
-
-        }
-
-
-
-        for(
-            let y=0;
-            y<=this.gridSize;
-            y++
-        ){
-
-            this.grid.lineBetween(
-                this.mapX,
-                this.mapY + y*this.cellSize,
-                this.mapX + this.mapWidth,
-                this.mapY + y*this.cellSize
-            );
-
-        }
-
-
-
-        this.input.on(
-            "pointerup",
-            pointer=>{
-
-
-                if(!this.dragObject)
-                    return;
-
-
-
-                const x =
-                Math.floor(
-                    (pointer.x-this.mapX)
-                    /
-                    this.cellSize
-                );
-
-
-                const y =
-                Math.floor(
-                    (pointer.y-this.mapY)
-                    /
-                    this.cellSize
-                );
-
-
-                if(
-                    x>=0 &&
-                    y>=0 &&
-                    x<this.gridSize &&
-                    y<this.gridSize
-                ){
-
-                    this.placeObject(
-                        x,
-                        y,
-                        this.dragObject.type
-                    );
-
-                }
-
-
-                this.dragObject.destroy();
-
-                this.dragObject = null;
-
-
-            }
-        );
-
-
-    }
-
-
-
-    placeObject(x,y,type){
-
-
-        const exists =
-        this.objects.find(
-            o=>o.x===x && o.y===y
-        );
-
-
-        if(exists)
-            return;
-
-
-
-        const cost =
-        this.costs[type];
-
-
-        if(this.money < cost)
-            return;
-
-
-
-        this.money -= cost;
-
-
-
-        this.moneyText.setText(
-            "ENERGIE : " + this.money
-        );
-
-
-
-        const colors = {
-
-            wall:0x884444,
-
-            enemy:0xff0000,
-
-            trap:0xffff00,
-
-            exit:0x00ff00
-
-        };
-
-
-
-        this.add.rectangle(
-            this.mapX+x*this.cellSize+this.cellSize/2,
-            this.mapY+y*this.cellSize+this.cellSize/2,
-            this.cellSize,
-            this.cellSize,
-            colors[type]
-        );
-
-
-
-        this.objects.push({
-
-            x:x,
-
-            y:y,
-
-            type:type
-
-        });
-
-
-
-        SocketManager.saveLevel(
-            this.objects
-        );
-
-
-    }
-
-
-
-    createStartButton(){
-
-        const button =
-        this.add.text(
-            this.scale.width/2,
-            this.scale.height-50,
-            "VALIDER LA MAP",
-            {
-                fontSize:"30px",
+                fontSize:"24px",
                 backgroundColor:"#008800",
                 padding:{
-                    x:20,
+                    x:15,
                     y:10
                 }
             }
         )
-        .setOrigin(0.5)
-        .setInteractive();
+        .setInteractive()
+        .setScrollFactor(0);
 
 
-
-        button.on(
+        this.validateButton.on(
             "pointerdown",
             ()=>{
-
-                SocketManager.saveLevel(
-                    this.objects
-                );
-
+                console.log(this.grid);
             }
         );
 
     }
 
 
+    createMap(){
 
-    setupCamera(){
+        for(let x=0;x<this.gridSize;x++){
 
-        const cam =
-        this.cameras.main;
+            for(let y=0;y<this.gridSize;y++){
 
-
-        cam.setBounds(
-            this.mapX,
-            this.mapY,
-            this.mapWidth,
-            this.mapHeight
-        );
-
-
-        cam.setZoom(
-            0.5
-        );
-
-
-
-        this.input.on(
-            "wheel",
-            (pointer,objects,deltaY)=>{
-
-
-                let zoom =
-                cam.zoom - deltaY*0.001;
-
-
-                zoom =
-                Phaser.Math.Clamp(
-                    zoom,
-                    0.2,
-                    2
+                this.add.image(
+                    this.mapX+x*this.cellSize+16,
+                    this.mapY+y*this.cellSize+16,
+                    "ground"
+                )
+                .setDisplaySize(
+                    this.cellSize,
+                    this.cellSize
                 );
 
-
-                cam.setZoom(
-                    zoom
-                );
-
-
             }
-        );
 
-
-
-        let dragging = false;
-
-        let startX = 0;
-
-        let startY = 0;
-
-
-
-        this.input.on(
-            "pointerdown",
-            pointer=>{
-
-
-                if(pointer.middleButtonDown()){
-
-                    dragging = true;
-
-                    startX = pointer.x;
-
-                    startY = pointer.y;
-
-                }
-
-
-            }
-        );
-
+        }
 
 
         this.input.on(
             "pointerup",
-            ()=>{
+            pointer=>{
 
-                dragging = false;
+                if(
+                    pointer.rightButtonDown()
+                ){
+
+                    this.removeObject(
+                        pointer.worldX,
+                        pointer.worldY
+                    );
+
+                }
 
             }
         );
-
 
 
         this.input.on(
             "pointermove",
             pointer=>{
 
+                if(this.draggingObject){
 
-                if(!dragging)
-                    return;
+                    this.draggingObject.x =
+                    pointer.worldX;
 
+                    this.draggingObject.y =
+                    pointer.worldY;
 
-
-                cam.scrollX +=
-                (startX-pointer.x)
-                /
-                cam.zoom;
-
-
-
-                cam.scrollY +=
-                (startY-pointer.y)
-                /
-                cam.zoom;
-
-
-
-                startX = pointer.x;
-
-                startY = pointer.y;
-
+                }
 
             }
         );
 
 
+        this.input.on(
+            "pointerup",
+            pointer=>{
+
+                if(!this.draggingObject)
+                    return;
+
+
+                this.placeObject(
+                    pointer.worldX,
+                    pointer.worldY
+                );
+
+
+                this.draggingObject.destroy();
+
+                this.draggingObject=null;
+
+            }
+        );
+
     }
 
 
+    createMenu(){
 
-    update(){
-
-        if(this.dragObject){
-
-            this.dragObject.x =
-            this.input.x;
+        let y=140;
+        const x=120;
 
 
-            this.dragObject.y =
-            this.input.y;
+        this.add.text(
+            x,
+            80,
+            "ELEMENTS",
+            {
+                fontSize:"32px",
+                color:"#ffffff"
+            }
+        )
+        .setOrigin(0.5)
+        .setScrollFactor(0);
 
-        }
+
+        Object.entries(this.items).forEach(
+            ([key,item])=>{
+
+                const box =
+                this.add.rectangle(
+                    x,
+                    y,
+                    220,
+                    70,
+                    0x333333
+                )
+                .setInteractive()
+                .setScrollFactor(0);
+
+
+                this.add.image(
+                    x-70,
+                    y,
+                    item.texture
+                )
+                .setDisplaySize(
+                    45,
+                    45
+                )
+                .setScrollFactor(0);
+
+
+                this.add.text(
+                    x-35,
+                    y-15,
+                    item.name,
+                    {
+                        fontSize:"18px",
+                        color:"#ffffff"
+                    }
+                )
+                .setScrollFactor(0);
+
+
+                this.add.text(
+                    x-35,
+                    y+10,
+                    "⚡ "+item.price,
+                    {
+                        fontSize:"16px",
+                        color:"#ffff00"
+                    }
+                )
+                .setScrollFactor(0);
+
+
+                box.on(
+                    "pointerdown",
+                    ()=>{
+                        this.startDrag(key);
+                    }
+                );
+
+
+                y+=85;
+
+            }
+        );
+
+    }
+
+
+    startDrag(type){
+
+        const item =
+        this.items[type];
+
+
+        if(this.energy < item.price)
+            return;
+
+
+        this.draggingType=type;
+
+
+        this.draggingObject =
+        this.add.image(
+            this.input.x,
+            this.input.y,
+            item.texture
+        )
+        .setDisplaySize(
+            32,
+            32
+        );
+
+    }
+
+
+    placeObject(x,y){
+
+        const gx =
+        Math.floor(
+            (x-this.mapX)/this.cellSize
+        );
+
+        const gy =
+        Math.floor(
+            (y-this.mapY)/this.cellSize
+        );
+
+
+        if(
+            gx<0 ||
+            gy<0 ||
+            gx>=this.gridSize ||
+            gy>=this.gridSize
+        )
+            return;
+
+
+        if(this.grid[gx][gy])
+            return;
+
+
+        const item =
+        this.items[this.draggingType];
+
+
+        this.energy -= item.price;
+
+
+        this.energyText.setText(
+            "⚡ Energie : "+this.energy
+        );
+
+
+        const image =
+        this.add.image(
+            this.mapX+gx*this.cellSize+16,
+            this.mapY+gy*this.cellSize+16,
+            item.texture
+        )
+        .setDisplaySize(
+            32,
+            32
+        );
+
+
+        this.grid[gx][gy]={
+            type:this.draggingType,
+            price:item.price,
+            blocked:item.blocked,
+            image:image
+        };
+
+
+        this.objects.push({
+            x:gx,
+            y:gy,
+            type:this.draggingType
+        });
+
+    }
+
+
+    removeObject(x,y){
+
+        const gx =
+        Math.floor(
+            (x-this.mapX)/this.cellSize
+        );
+
+        const gy =
+        Math.floor(
+            (y-this.mapY)/this.cellSize
+        );
+
+
+        const object =
+        this.grid[gx]?.[gy];
+
+
+        if(!object)
+            return;
+
+
+        this.energy += object.price;
+
+
+        this.energyText.setText(
+            "⚡ Energie : "+this.energy
+        );
+
+
+        object.image.destroy();
+
+
+        this.grid[gx][gy]=null;
+
+
+        this.objects =
+        this.objects.filter(
+            o=>!(o.x===gx && o.y===gy)
+        );
+
+    }
+
+
+    isBlocked(x,y){
+
+        return !!this.grid[x]?.[y]?.blocked;
+
+    }
+
+
+    createCamera(){
+
+        this.cameras.main.setZoom(0.35);
+
+
+        this.input.on(
+            "wheel",
+            (pointer,objects,dx,dy)=>{
+
+                let zoom =
+                this.cameras.main.zoom-dy*0.001;
+
+
+                zoom =
+                Phaser.Math.Clamp(
+                    zoom,
+                    0.2,
+                    1
+                );
+
+
+                this.cameras.main.setZoom(
+                    zoom
+                );
+
+            }
+        );
 
     }
 
