@@ -32,11 +32,6 @@ export default class LobbyScene extends Phaser.Scene {
         this.scale.width;
 
 
-        const height =
-        this.scale.height;
-
-
-
 
 
 
@@ -51,8 +46,6 @@ export default class LobbyScene extends Phaser.Scene {
             }
         )
         .setOrigin(0.5);
-
-
 
 
 
@@ -77,10 +70,7 @@ export default class LobbyScene extends Phaser.Scene {
 
 
 
-
-        // =========================
         // PLAYERS
-        // =========================
 
 
         this.add.text(
@@ -109,7 +99,6 @@ export default class LobbyScene extends Phaser.Scene {
 
 
 
-
         this.drawPlayers(
             this.session.players
         );
@@ -122,10 +111,7 @@ export default class LobbyScene extends Phaser.Scene {
 
 
 
-        // =========================
         // CHAT
-        // =========================
-
 
 
         this.add.text(
@@ -140,19 +126,6 @@ export default class LobbyScene extends Phaser.Scene {
         .setOrigin(0.5);
 
 
-
-
-
-
-
-
-        this.add.rectangle(
-            width * 0.75,
-            380,
-            450,
-            260,
-            0x222222
-        );
 
 
 
@@ -188,7 +161,6 @@ export default class LobbyScene extends Phaser.Scene {
 
 
 
-
         SocketManager.onChatMessage(
             (data)=>{
 
@@ -215,6 +187,7 @@ export default class LobbyScene extends Phaser.Scene {
         );
 
 
+
         this.events.once(
             "destroy",
             ()=>{
@@ -225,9 +198,6 @@ export default class LobbyScene extends Phaser.Scene {
 
 
     }
-
-
-
 
 
 
@@ -252,13 +222,8 @@ export default class LobbyScene extends Phaser.Scene {
 
 
 
-
-
         players.forEach(
             (player)=>{
-
-
-
 
 
 
@@ -271,16 +236,10 @@ export default class LobbyScene extends Phaser.Scene {
 
 
 
-
-
                 avatar.setDisplaySize(
                     55,
                     55
                 );
-
-
-
-
 
 
 
@@ -305,17 +264,12 @@ export default class LobbyScene extends Phaser.Scene {
 
 
 
-
-
                 this.playersContainer.add(
                     [
                         avatar,
                         name
                     ]
                 );
-
-
-
 
 
 
@@ -327,11 +281,7 @@ export default class LobbyScene extends Phaser.Scene {
         );
 
 
-
     }
-
-
-
 
 
 
@@ -356,7 +306,7 @@ export default class LobbyScene extends Phaser.Scene {
 
 
         chatBox.style.left =
-        "calc(75% - 220px)";
+        "calc(75% - 225px)";
 
 
 
@@ -366,12 +316,12 @@ export default class LobbyScene extends Phaser.Scene {
 
 
         chatBox.style.width =
-        "430px";
+        "450px";
 
 
 
         chatBox.style.height =
-        "250px";
+        "260px";
 
 
 
@@ -381,7 +331,7 @@ export default class LobbyScene extends Phaser.Scene {
 
 
         chatBox.style.color =
-        "#fff";
+        "white";
 
 
 
@@ -406,7 +356,7 @@ export default class LobbyScene extends Phaser.Scene {
 
 
         chatBox.style.borderRadius =
-        "5px";
+        "0px";
 
 
 
@@ -422,9 +372,6 @@ export default class LobbyScene extends Phaser.Scene {
 
 
     }
-
-
-
 
 
 
@@ -454,17 +401,17 @@ export default class LobbyScene extends Phaser.Scene {
 
 
         input.style.left =
-        "calc(75% - 220px)";
+        "calc(75% - 225px)";
 
 
 
         input.style.top =
-        "500px";
+        "520px";
 
 
 
         input.style.width =
-        "320px";
+        "350px";
 
 
 
@@ -475,6 +422,11 @@ export default class LobbyScene extends Phaser.Scene {
 
         input.style.fontSize =
         "18px";
+
+
+
+        input.style.boxSizing =
+        "border-box";
 
 
 
@@ -506,17 +458,17 @@ export default class LobbyScene extends Phaser.Scene {
 
 
         button.style.left =
-        "calc(75% + 105px)";
+        "calc(75% + 130px)";
 
 
 
         button.style.top =
-        "500";
+        "520px";
 
 
 
         button.style.width =
-        "75px";
+        "90px";
 
 
 
@@ -533,7 +485,6 @@ export default class LobbyScene extends Phaser.Scene {
         document.body.appendChild(
             button
         );
-
 
 
 
@@ -586,7 +537,6 @@ export default class LobbyScene extends Phaser.Scene {
 
 
 
-
         input.addEventListener(
             "keydown",
             (event)=>{
@@ -596,9 +546,7 @@ export default class LobbyScene extends Phaser.Scene {
                     event.key === "Enter"
                 ){
 
-
                     sendMessage();
-
 
                 }
 
@@ -616,15 +564,13 @@ export default class LobbyScene extends Phaser.Scene {
         input;
 
 
+
         this.chatButton =
         button;
 
 
 
     }
-
-
-
 
 
 
@@ -689,7 +635,6 @@ export default class LobbyScene extends Phaser.Scene {
 
 
     }
-
 
 
 
