@@ -459,7 +459,7 @@ export default class LobbyScene extends Phaser.Scene {
 
 
         input.style.top =
-        "110px";
+        "310px";
 
 
 
@@ -511,7 +511,7 @@ export default class LobbyScene extends Phaser.Scene {
 
 
         button.style.top =
-        "110px";
+        "310px";
 
 
 
