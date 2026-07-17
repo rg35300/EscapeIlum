@@ -12,20 +12,14 @@ export default class MenuScene extends Phaser.Scene {
 
 
 
-
-
     create(){
 
 
         this.selectedAvatar = "SAMOYED_1";
 
 
-        const width =
-        this.scale.width;
-
-
-        const height =
-        this.scale.height;
+        const width = this.scale.width;
+        const height = this.scale.height;
 
 
 
@@ -43,11 +37,6 @@ export default class MenuScene extends Phaser.Scene {
 
 
 
-
-
-
-        // TITRE AVATAR
-
         this.add.text(
             width / 2,
             260,
@@ -58,9 +47,6 @@ export default class MenuScene extends Phaser.Scene {
             }
         )
         .setOrigin(0.5);
-
-
-
 
 
 
@@ -84,18 +70,11 @@ export default class MenuScene extends Phaser.Scene {
 
 
 
-
-
-
         let startX =
         width / 2 - 210;
 
 
-        let y =
-        340;
-
-
-
+        let y = 340;
 
 
 
@@ -111,26 +90,13 @@ export default class MenuScene extends Phaser.Scene {
                 );
 
 
-
                 img.setDisplaySize(
                     60,
                     60
                 );
 
 
-
                 img.setInteractive();
-
-
-
-                img.setMask(
-                    this.createCircleMask(
-                        startX + index * 70,
-                        y,
-                        30
-                    )
-                );
-
 
 
                 img.on(
@@ -142,7 +108,6 @@ export default class MenuScene extends Phaser.Scene {
                         avatar;
 
 
-
                         this.updateAvatarSelection(
                             avatar
                         );
@@ -152,20 +117,17 @@ export default class MenuScene extends Phaser.Scene {
                 );
 
 
-
                 this.avatarImages.push({
 
                     name:avatar,
 
                     image:img
 
-
                 });
 
 
             }
         );
-
 
 
 
@@ -177,12 +139,6 @@ export default class MenuScene extends Phaser.Scene {
 
 
 
-
-
-
-
-
-        // MENU HTML
 
         const container =
         document.createElement("div");
@@ -198,7 +154,7 @@ export default class MenuScene extends Phaser.Scene {
 
 
         container.style.top =
-        "150px";
+        "480px";
 
 
         container.style.transform =
@@ -230,10 +186,6 @@ export default class MenuScene extends Phaser.Scene {
 
 
 
-
-
-
-
         const nameInput =
         document.createElement("input");
 
@@ -255,9 +207,6 @@ export default class MenuScene extends Phaser.Scene {
 
 
 
-
-
-
         const hostButton =
         this.createHTMLButton(
             "HOST",
@@ -268,9 +217,6 @@ export default class MenuScene extends Phaser.Scene {
         container.appendChild(
             hostButton
         );
-
-
-
 
 
 
@@ -297,9 +243,6 @@ export default class MenuScene extends Phaser.Scene {
 
 
 
-
-
-
         const joinButton =
         this.createHTMLButton(
             "JOIN",
@@ -310,7 +253,6 @@ export default class MenuScene extends Phaser.Scene {
         container.appendChild(
             joinButton
         );
-
 
 
 
@@ -365,8 +307,6 @@ export default class MenuScene extends Phaser.Scene {
 
 
 
-
-
         joinButton.onclick =
         ()=>{
 
@@ -400,12 +340,9 @@ export default class MenuScene extends Phaser.Scene {
                 sessionId:
                 codeInput.value.toUpperCase(),
 
-
                 name:nameInput.value,
 
-
                 avatar:this.selectedAvatar
-
 
             });
 
@@ -413,44 +350,7 @@ export default class MenuScene extends Phaser.Scene {
         };
 
 
-
-
     }
-
-
-
-
-
-
-
-
-
-    createCircleMask(x,y,radius){
-
-
-        const graphics =
-        this.make.graphics();
-
-
-        graphics.fillStyle(
-            0xffffff
-        );
-
-
-        graphics.fillCircle(
-            x,
-            y,
-            radius
-        );
-
-
-        return graphics.createGeometryMask();
-
-
-    }
-
-
-
 
 
 
@@ -460,14 +360,11 @@ export default class MenuScene extends Phaser.Scene {
     updateAvatarSelection(selected){
 
 
-
         this.avatarImages.forEach(
             (data)=>{
 
 
-                if(
-                    data.name === selected
-                ){
+                if(data.name === selected){
 
 
                     data.image.setScale(
@@ -492,10 +389,6 @@ export default class MenuScene extends Phaser.Scene {
 
 
     }
-
-
-
-
 
 
 
@@ -526,9 +419,6 @@ export default class MenuScene extends Phaser.Scene {
 
 
 
-
-
-
     createHTMLButton(text,color){
 
 
@@ -536,10 +426,8 @@ export default class MenuScene extends Phaser.Scene {
         document.createElement("button");
 
 
-
         button.innerText =
         text;
-
 
 
         button.style.width =
@@ -566,15 +454,10 @@ export default class MenuScene extends Phaser.Scene {
         "pointer";
 
 
-
         return button;
 
 
     }
-
-
-
-
 
 
 }

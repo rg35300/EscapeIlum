@@ -1,10 +1,9 @@
 import Phaser from "phaser";
 
 import MenuScene from "./scenes/MenuScene.js";
-
 import LobbyScene from "./scenes/LobbyScene.js";
-
 import BootScene from "./scenes/BootScene.js";
+
 
 const config = {
 
@@ -35,11 +34,9 @@ const config = {
 
     scene:[
 
+        BootScene,
         MenuScene,
-
-        LobbyScene,
-
-        BootScene
+        LobbyScene
 
     ]
 
