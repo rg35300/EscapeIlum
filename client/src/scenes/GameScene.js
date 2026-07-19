@@ -1,59 +1,71 @@
 import Phaser from "phaser";
+
 import WorldBuilder from "../game/WorldBuilder.js";
+
 import EmployeeController from "../game/controllers/EmployeeController.js";
 import IlumController from "../game/controllers/IlumController.js";
 
 
+
 export default class GameScene extends Phaser.Scene{
 
+
 constructor(){
+
 super("GameScene");
+
 }
+
 
 
 init(data){
 
-this.role=data.role;
 this.session=data.session;
 
+this.role=data.role;
+
 }
+
 
 
 create(){
 
-const walls=new WorldBuilder(this).create();
+
+
+const builder=
+new WorldBuilder(this);
+
+
+
+const walls=
+builder.create();
+
+
+
 
 
 if(this.role==="ilum"){
 
-this.controller=new IlumController(this);
 
-}else{
+this.controller=
+new IlumController(this);
 
-this.controller=new EmployeeController(this);
 
 }
+else{
 
 
-if(this.controller.player){
+this.controller=
+new EmployeeController(this);
+
+
 
 this.physics.add.collider(
 this.controller.player,
 walls
 );
 
-}
 
-
-this.createCamera();
-
-}
-
-
-
-createCamera(){
-
-if(this.role==="employee"){
 
 this.cameras.main.startFollow(
 this.controller.player,
@@ -62,13 +74,26 @@ true,
 0.1
 );
 
-this.cameras.main.setZoom(1.5);
 
-}else{
 
-this.cameras.main.setZoom(0.8);
+this.cameras.main.setZoom(
+1.5
+);
+
+
 
 }
+
+
+
+this.cameras.main.setBounds(
+0,
+0,
+640,
+640
+);
+
+
 
 }
 
@@ -76,8 +101,13 @@ this.cameras.main.setZoom(0.8);
 
 update(){
 
+
+if(this.controller)
 this.controller.update();
 
+
+
 }
+
 
 }

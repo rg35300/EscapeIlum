@@ -1,13 +1,18 @@
 export default class IlumController{
 
+
 constructor(scene){
+
 
 this.scene=scene;
 
-this.speed=8;
+
+this.speed=10;
 
 
-this.keys=scene.input.keyboard.addKeys({
+
+this.keys=
+scene.input.keyboard.addKeys({
 
 up:"Z",
 down:"S",
@@ -17,28 +22,52 @@ right:"D"
 });
 
 
+
+scene.cameras.main.setZoom(
+0.8
+);
+
+
+
 scene.input.on(
 "wheel",
 (pointer,objects,dx,dy)=>{
 
-const cam=scene.cameras.main;
 
-cam.zoom-=dy*0.001;
+let zoom=
+scene.cameras.main.zoom;
 
-cam.zoom=Phaser.Math.Clamp(
-cam.zoom,
-0.5,
+
+zoom-=dy*0.001;
+
+
+
+scene.cameras.main.setZoom(
+
+Phaser.Math.Clamp(
+zoom,
+0.4,
 1.5
+)
+
 );
 
+
+
 });
+
+
 
 }
 
 
+
 update(){
 
-const cam=this.scene.cameras.main;
+
+const cam=
+this.scene.cameras.main;
+
 
 
 if(this.keys.left.isDown)
@@ -58,5 +87,7 @@ cam.scrollY+=this.speed;
 
 
 }
+
+
 
 }
