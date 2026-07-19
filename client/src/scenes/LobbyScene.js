@@ -236,11 +236,12 @@ export default class LobbyScene extends Phaser.Scene {
 
 
                 this.scene.start(
-                    "IlumScene",
-                    {
-                        session:session
-                    }
-                );
+"GameScene",
+{
+session:session,
+role:me.role
+}
+);
 
 
             }
@@ -248,11 +249,12 @@ export default class LobbyScene extends Phaser.Scene {
 
 
                 this.scene.start(
-                    "EmployeeScene",
+                    "GameScene",
                     {
-                        session:session
+                    session:session,
+                    role:me.role
                     }
-                );
+                    );
 
 
             }
