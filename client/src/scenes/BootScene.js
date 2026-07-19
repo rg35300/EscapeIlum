@@ -8,55 +8,132 @@ import SAMOYED_5 from "../../assets/sprites/avatars/SAMOYED_5.png";
 import SAMOYED_6 from "../../assets/sprites/avatars/SAMOYED_6.png";
 import SAMOYED_7 from "../../assets/sprites/avatars/SAMOYED_7.png";
 
-import ground from "../../assets/images/ilum/Ground.png";
-import groundGrid from "../../assets/images/ilum/GroundGrid.png";
-import shelf from "../../assets/images/ilum/Shelf.png";
-import shelfGrid from "../../assets/images/ilum/ShelfGrid.png";
-import exit from "../../assets/images/ilum/Exit.png";
-import exitGrid from "../../assets/images/ilum/ExitGrid.png";
+import Ground from "../../assets/images/ilum/Ground.png";
+import GroundGrid from "../../assets/images/ilum/GroundGrid.png";
+
+import Shelf from "../../assets/images/ilum/Shelf.png";
+import ShelfGrid from "../../assets/images/ilum/ShelfGrid.png";
+
+import Exit from "../../assets/images/ilum/Exit.png";
+import ExitGrid from "../../assets/images/ilum/ExitGrid.png";
+
+import Wall from "../../assets/images/ilum/Wall.png";
+import WallGrid from "../../assets/images/ilum/WallGrid.png";
+
+import LatexPit from "../../assets/images/ilum/LatexPit.png";
+import LatexPitGrid from "../../assets/images/ilum/LatexPitGrid.png";
+
+import Glider from "../../assets/images/ilum/Glider.png";
+import GliderUpGrid from "../../assets/images/ilum/GliderUpGrid.png";
+import GliderDownGrid from "../../assets/images/ilum/GliderDownGrid.png";
+import GliderLeftGrid from "../../assets/images/ilum/GliderLeftGrid.png";
+import GliderRightGrid from "../../assets/images/ilum/GliderRightGrid.png";
+
+import SqueakIlumGrid from "../../assets/images/ilum/SqueakIlumGrid.png";
 
 import player from "../../assets/images/employee/player.png";
 import playerCorrupted from "../../assets/images/employee/PlayerCorrupted.png";
 
-export default class BootScene extends Phaser.Scene {
+
+export default class BootScene extends Phaser.Scene{
 
     constructor(){
         super("BootScene");
     }
 
+
     preload(){
 
-        const avatars={
+        const assets={
+
             SAMOYED_1,
             SAMOYED_2,
             SAMOYED_3,
             SAMOYED_4,
             SAMOYED_5,
             SAMOYED_6,
-            SAMOYED_7
-        };
+            SAMOYED_7,
 
-        Object.entries(avatars).forEach(([key,value])=>{
-            this.load.image(key,value);
-        });
+            ground:Ground,
+            groundGrid:GroundGrid,
 
-        const assets={
-            ground,
-            groundGrid,
-            shelf,
-            shelfGrid,
-            exit,
-            exitGrid,
+            shelf:Shelf,
+            shelfGrid:ShelfGrid,
+
+            exit:Exit,
+            exitGrid:ExitGrid,
+
+            wall:Wall,
+            wallGrid:WallGrid,
+
+            latexPit:LatexPit,
+            latexPitGrid:LatexPitGrid,
+
+            glider:Glider,
+            gliderUpGrid:GliderUpGrid,
+            gliderDownGrid:GliderDownGrid,
+            gliderLeftGrid:GliderLeftGrid,
+            gliderRightGrid:GliderRightGrid,
+
+            squeakIlumGrid:SqueakIlumGrid,
+
             player,
             playerCorrupted
+
         };
 
-        Object.entries(assets).forEach(([key,value])=>{
-            this.load.image(key,value);
+
+        Object.entries(assets)
+        .forEach(([key,value])=>{
+
+            this.load.image(
+                key,
+                value
+            );
+
         });
+
+
+        const loading=this.add.text(
+            this.scale.width/2,
+            this.scale.height/2,
+            "Chargement...",
+            {
+                fontSize:"32px",
+                color:"#ffffff"
+            }
+        )
+        .setOrigin(0.5);
+
+
+        this.load.on(
+            "progress",
+            value=>{
+
+                loading.setText(
+                    "Chargement "+Math.floor(value*100)+"%"
+                );
+
+            }
+        );
+
+
+        this.load.on(
+            "complete",
+            ()=>{
+                loading.destroy();
+            }
+        );
+
     }
 
+
     create(){
-        this.scene.start("MenuScene");
+
+        this.scene.start(
+            "MenuScene"
+        );
+
     }
+
 }
