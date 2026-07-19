@@ -15,17 +15,18 @@ export default class IlumScene extends Phaser.Scene {
         this.gridSize=40;
         this.cellSize=32;
 
-        this.menuWidth=window.innerWidth*0.25;
+        this.menuWidth=Math.floor(this.scale.width*0.25);
 
-        this.mapX=this.menuWidth+20;
-        this.mapY=20;
+        this.mapX=this.menuWidth;
+        this.mapY=0;
 
         this.selected=null;
 
         this.grid=[];
         this.objects=[];
 
-        this.menuScroll=0;
+        this.menuContainer=null;
+        this.menuMask=null;
 
         this.items={
             shelf:{
@@ -44,6 +45,23 @@ export default class IlumScene extends Phaser.Scene {
 
     create(){
 
+        this.createGrid();
+
+        this.createWorld();
+
+        this.createUI();
+
+        this.createMenu();
+
+        this.createInput();
+
+        this.createCamera();
+
+    }
+
+
+    createGrid(){
+
         for(let x=0;x<this.gridSize;x++){
 
             this.grid[x]=[];
@@ -51,60 +69,13 @@ export default class IlumScene extends Phaser.Scene {
             for(let y=0;y<this.gridSize;y++){
                 this.grid[x][y]=null;
             }
+
         }
 
-
-        this.createCamera();
-        this.createGround();
-        this.createUI();
-        this.createMenu();
-        this.createInput();
-
     }
 
 
-    createCamera(){
-
-        this.cameras.main.setZoom(0.6);
-
-
-        this.cameras.main.setBounds(
-            this.mapX,
-            this.mapY,
-            this.gridSize*this.cellSize,
-            this.gridSize*this.cellSize
-        );
-
-
-        this.input.on(
-            "wheel",
-            (pointer,objects,dx,dy)=>{
-
-                if(pointer.x<this.menuWidth)
-                    return;
-
-
-                let zoom=
-                this.cameras.main.zoom-dy*0.001;
-
-
-                zoom=Phaser.Math.Clamp(
-                    zoom,
-                    0.25,
-                    1
-                );
-
-
-                this.cameras.main.setZoom(
-                    zoom
-                );
-            }
-        );
-
-    }
-
-
-    createGround(){
+    createWorld(){
 
         for(let x=0;x<this.gridSize;x++){
 
@@ -122,19 +93,21 @@ export default class IlumScene extends Phaser.Scene {
 
             }
         }
+
     }
 
 
     createUI(){
 
-        this.add.rectangle(
+        const panel=this.add.rectangle(
             this.menuWidth/2,
             this.scale.height/2,
             this.menuWidth,
             this.scale.height,
             0x111111
-        )
-        .setScrollFactor(0);
+        );
+
+        panel.setScrollFactor(0);
 
 
         this.energyText=this.add.text(
@@ -142,22 +115,36 @@ export default class IlumScene extends Phaser.Scene {
             20,
             "⚡ Energie : "+this.energy,
             {
-                fontSize:"28px",
+                fontSize:"26px",
                 color:"#ffff00"
+            }
+        );
+
+        this.energyText.setScrollFactor(0);
+
+
+        this.add.text(
+            20,
+            75,
+            "ELEMENTS",
+            {
+                fontSize:"24px",
+                color:"#ffffff"
             }
         )
         .setScrollFactor(0);
 
 
-        this.add.text(
+        this.add.line(
             20,
-            80,
-            "ELEMENTS",
-            {
-                fontSize:"26px",
-                color:"#ffffff"
-            }
+            110,
+            0,
+            0,
+            this.menuWidth-40,
+            0,
+            0xffffff
         )
+        .setOrigin(0)
         .setScrollFactor(0);
 
     }
@@ -165,14 +152,39 @@ export default class IlumScene extends Phaser.Scene {
 
     createMenu(){
 
+        const menuTop=130;
+        const menuHeight=this.scale.height-menuTop-20;
+
+
         this.menuContainer=this.add.container(
             0,
-            120
-        )
-        .setScrollFactor(0);
+            menuTop
+        );
+
+        this.menuContainer.setScrollFactor(0);
 
 
-        let y=0;
+        const maskShape=this.make.graphics();
+
+        maskShape.fillStyle(0xffffff);
+
+        maskShape.fillRect(
+            0,
+            menuTop,
+            this.menuWidth,
+            menuHeight
+        );
+
+
+        this.menuMask=maskShape.createGeometryMask();
+
+
+        this.menuContainer.setMask(
+            this.menuMask
+        );
+
+
+        let y=40;
 
 
         Object.entries(this.items)
@@ -243,22 +255,71 @@ export default class IlumScene extends Phaser.Scene {
         });
 
 
+        this.menuMaxScroll=
+        Math.max(
+            0,
+            y-menuHeight
+        );
+
+
+        this.menuScroll=0;
+
+    }
+
+
+    createCamera(){
+
+        this.cameras.main.setZoom(0.6);
+
+
+        this.cameras.main.setBounds(
+            this.mapX,
+            this.mapY,
+            this.gridSize*this.cellSize,
+            this.gridSize*this.cellSize
+        );
+
+
         this.input.on(
             "wheel",
             (pointer,objects,dx,dy)=>{
 
-                if(pointer.x>this.menuWidth)
+                if(pointer.x<this.menuWidth){
+
+                    this.menuScroll-=dy;
+
+
+                    this.menuScroll=
+                    Phaser.Math.Clamp(
+                        this.menuScroll,
+                        0,
+                        this.menuMaxScroll
+                    );
+
+
+                    this.menuContainer.y=
+                    130-this.menuScroll;
+
+
                     return;
 
+                }
 
-                this.menuContainer.y-=dy;
+
+                let zoom=
+                this.cameras.main.zoom-dy*0.001;
 
 
-                this.menuContainer.y=
+                zoom=
                 Phaser.Math.Clamp(
-                    this.menuContainer.y,
-                    -300,
-                    120
+                    zoom,
+                    0.25,
+                    1
+                );
+
+
+                this.cameras.main.setZoom(
+                    zoom
                 );
 
             }
@@ -289,6 +350,7 @@ export default class IlumScene extends Phaser.Scene {
                     );
 
                     return;
+
                 }
 
 
