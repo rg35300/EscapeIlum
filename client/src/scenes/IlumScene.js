@@ -15,13 +15,17 @@ export default class IlumScene extends Phaser.Scene {
         this.gridSize=40;
         this.cellSize=32;
 
-        this.mapX=400;
-        this.mapY=40;
+        this.menuWidth=window.innerWidth*0.25;
+
+        this.mapX=this.menuWidth+20;
+        this.mapY=20;
 
         this.selected=null;
 
         this.grid=[];
         this.objects=[];
+
+        this.menuScroll=0;
 
         this.items={
             shelf:{
@@ -47,14 +51,55 @@ export default class IlumScene extends Phaser.Scene {
             for(let y=0;y<this.gridSize;y++){
                 this.grid[x][y]=null;
             }
-
         }
 
+
+        this.createCamera();
         this.createGround();
-        this.createHUD();
+        this.createUI();
         this.createMenu();
         this.createInput();
-        this.createCamera();
+
+    }
+
+
+    createCamera(){
+
+        this.cameras.main.setZoom(0.6);
+
+
+        this.cameras.main.setBounds(
+            this.mapX,
+            this.mapY,
+            this.gridSize*this.cellSize,
+            this.gridSize*this.cellSize
+        );
+
+
+        this.input.on(
+            "wheel",
+            (pointer,objects,dx,dy)=>{
+
+                if(pointer.x<this.menuWidth)
+                    return;
+
+
+                let zoom=
+                this.cameras.main.zoom-dy*0.001;
+
+
+                zoom=Phaser.Math.Clamp(
+                    zoom,
+                    0.25,
+                    1
+                );
+
+
+                this.cameras.main.setZoom(
+                    zoom
+                );
+            }
+        );
 
     }
 
@@ -80,7 +125,17 @@ export default class IlumScene extends Phaser.Scene {
     }
 
 
-    createHUD(){
+    createUI(){
+
+        this.add.rectangle(
+            this.menuWidth/2,
+            this.scale.height/2,
+            this.menuWidth,
+            this.scale.height,
+            0x111111
+        )
+        .setScrollFactor(0);
+
 
         this.energyText=this.add.text(
             20,
@@ -94,77 +149,69 @@ export default class IlumScene extends Phaser.Scene {
         .setScrollFactor(0);
 
 
-        const button=this.add.text(
+        this.add.text(
             20,
-            650,
-            "VALIDER",
+            80,
+            "ELEMENTS",
             {
-                fontSize:"24px",
-                backgroundColor:"#008800",
-                padding:{
-                    x:15,
-                    y:10
-                }
+                fontSize:"26px",
+                color:"#ffffff"
             }
         )
-        .setInteractive()
         .setScrollFactor(0);
-
-
-        button.on(
-            "pointerdown",
-            ()=>{
-                console.log(this.level());
-            }
-        );
 
     }
 
 
     createMenu(){
 
-        let y=120;
+        this.menuContainer=this.add.container(
+            0,
+            120
+        )
+        .setScrollFactor(0);
+
+
+        let y=0;
 
 
         Object.entries(this.items)
         .forEach(([key,item])=>{
 
+
             const box=this.add.rectangle(
-                120,
+                this.menuWidth/2,
                 y,
-                220,
-                70,
+                this.menuWidth-40,
+                80,
                 0x333333
             )
-            .setInteractive()
-            .setScrollFactor(0);
+            .setInteractive();
 
 
-            this.add.image(
-                65,
+            const image=this.add.image(
+                60,
                 y,
                 item.texture
             )
             .setDisplaySize(
-                45,
-                45
-            )
-            .setScrollFactor(0);
+                50,
+                50
+            );
 
 
-            this.add.text(
+            const name=this.add.text(
                 100,
-                y-18,
+                y-20,
                 item.name,
                 {
                     fontSize:"20px",
                     color:"#ffffff"
                 }
-            )
-            .setScrollFactor(0);
+            );
 
 
-            this.add.text(
+            const price=this.add.text(
                 100,
                 y+10,
                 "⚡ "+item.price,
@@ -172,8 +219,15 @@ export default class IlumScene extends Phaser.Scene {
                     fontSize:"16px",
                     color:"#ffff00"
                 }
-            )
-            .setScrollFactor(0);
+            );
+
+
+            this.menuContainer.add([
+                box,
+                image,
+                name,
+                price
+            ]);
 
 
             box.on(
@@ -184,18 +238,47 @@ export default class IlumScene extends Phaser.Scene {
             );
 
 
-            y+=90;
+            y+=100;
 
         });
+
+
+        this.input.on(
+            "wheel",
+            (pointer,objects,dx,dy)=>{
+
+                if(pointer.x>this.menuWidth)
+                    return;
+
+
+                this.menuContainer.y-=dy;
+
+
+                this.menuContainer.y=
+                Phaser.Math.Clamp(
+                    this.menuContainer.y,
+                    -300,
+                    120
+                );
+
+            }
+        );
 
     }
 
 
     createInput(){
 
+        this.input.mouse.disableContextMenu();
+
+
         this.input.on(
             "pointerdown",
             pointer=>{
+
+
+                if(pointer.x<this.menuWidth)
+                    return;
 
 
                 if(pointer.rightButtonDown()){
@@ -230,6 +313,7 @@ export default class IlumScene extends Phaser.Scene {
             (x-this.mapX)/this.cellSize
         );
 
+
         const gy=Math.floor(
             (y-this.mapY)/this.cellSize
         );
@@ -260,7 +344,7 @@ export default class IlumScene extends Phaser.Scene {
         const item=this.items[this.selected];
 
 
-        if(this.energy < item.price)
+        if(this.energy<item.price)
             return;
 
 
@@ -305,6 +389,7 @@ export default class IlumScene extends Phaser.Scene {
             (x-this.mapX)/this.cellSize
         );
 
+
         const gy=Math.floor(
             (y-this.mapY)/this.cellSize
         );
@@ -346,38 +431,8 @@ export default class IlumScene extends Phaser.Scene {
         return {
             width:this.gridSize,
             height:this.gridSize,
-            energy:this.energy,
             objects:this.objects
         };
-
-    }
-
-
-    createCamera(){
-
-        this.cameras.main.setZoom(0.5);
-
-
-        this.input.on(
-            "wheel",
-            (pointer,objects,dx,dy)=>{
-
-                let zoom=this.cameras.main.zoom-dy*0.001;
-
-
-                zoom=Phaser.Math.Clamp(
-                    zoom,
-                    0.25,
-                    1
-                );
-
-
-                this.cameras.main.setZoom(
-                    zoom
-                );
-
-            }
-        );
 
     }
 
