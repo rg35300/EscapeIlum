@@ -1,5 +1,4 @@
 import Phaser from "phaser";
-import SocketManager from "../network/SocketManager.js";
 
 export default class IlumScene extends Phaser.Scene {
 
@@ -9,72 +8,33 @@ export default class IlumScene extends Phaser.Scene {
 
     init(data){
 
-        this.session = data.session;
+        this.session=data.session;
 
-        this.energy = 1000;
+        this.energy=500;
 
-        this.gridSize = 150;
-        this.cellSize = 32;
+        this.gridSize=40;
+        this.cellSize=32;
 
-        this.mapX = 450;
-        this.mapY = 40;
+        this.mapX=400;
+        this.mapY=40;
 
-        this.objects = [];
-        this.grid = [];
+        this.selected=null;
 
-        this.draggingObject = null;
+        this.grid=[];
+        this.objects=[];
 
-        this.items = {
-            wall:{
-                texture:"wall",
-                name:"Mur",
-                price:10,
-                blocked:true
+        this.items={
+            shelf:{
+                texture:"shelfGrid",
+                name:"Shelf",
+                price:20
             },
-            enemy:{
-                texture:"enemy",
-                name:"Ennemi",
-                price:100,
-                blocked:false
-            },
-            latexPit:{
-                texture:"latexPit",
-                name:"Trou Latex",
-                price:50,
-                blocked:true
-            },
-            squeakIlum:{
-                texture:"squeakIlum",
-                name:"Squeak",
-                price:150,
-                blocked:false
-            },
-            gliderUp:{
-                texture:"gliderUp",
-                name:"Glider Haut",
-                price:75,
-                blocked:true
-            },
-            gliderDown:{
-                texture:"gliderDown",
-                name:"Glider Bas",
-                price:75,
-                blocked:true
-            },
-            gliderLeft:{
-                texture:"gliderLeft",
-                name:"Glider Gauche",
-                price:75,
-                blocked:true
-            },
-            gliderRight:{
-                texture:"gliderRight",
-                name:"Glider Droite",
-                price:75,
-                blocked:true
+            exit:{
+                texture:"exitGrid",
+                name:"Exit",
+                price:0
             }
         };
-
     }
 
 
@@ -90,18 +50,39 @@ export default class IlumScene extends Phaser.Scene {
 
         }
 
+        this.createGround();
         this.createHUD();
-        this.createMap();
         this.createMenu();
+        this.createInput();
         this.createCamera();
 
     }
 
 
+    createGround(){
+
+        for(let x=0;x<this.gridSize;x++){
+
+            for(let y=0;y<this.gridSize;y++){
+
+                this.add.image(
+                    this.mapX+x*this.cellSize+16,
+                    this.mapY+y*this.cellSize+16,
+                    "groundGrid"
+                )
+                .setDisplaySize(
+                    this.cellSize,
+                    this.cellSize
+                );
+
+            }
+        }
+    }
+
+
     createHUD(){
 
-        this.energyText =
-        this.add.text(
+        this.energyText=this.add.text(
             20,
             20,
             "⚡ Energie : "+this.energy,
@@ -113,8 +94,7 @@ export default class IlumScene extends Phaser.Scene {
         .setScrollFactor(0);
 
 
-        this.validateButton =
-        this.add.text(
+        const button=this.add.text(
             20,
             650,
             "VALIDER",
@@ -131,92 +111,10 @@ export default class IlumScene extends Phaser.Scene {
         .setScrollFactor(0);
 
 
-        this.validateButton.on(
+        button.on(
             "pointerdown",
             ()=>{
-                console.log(this.grid);
-            }
-        );
-
-    }
-
-
-    createMap(){
-
-        for(let x=0;x<this.gridSize;x++){
-
-            for(let y=0;y<this.gridSize;y++){
-
-                this.add.image(
-                    this.mapX+x*this.cellSize+16,
-                    this.mapY+y*this.cellSize+16,
-                    "ground"
-                )
-                .setDisplaySize(
-                    this.cellSize,
-                    this.cellSize
-                );
-
-            }
-
-        }
-
-
-        this.input.on(
-            "pointerup",
-            pointer=>{
-
-                if(
-                    pointer.rightButtonDown()
-                ){
-
-                    this.removeObject(
-                        pointer.worldX,
-                        pointer.worldY
-                    );
-
-                }
-
-            }
-        );
-
-
-        this.input.on(
-            "pointermove",
-            pointer=>{
-
-                if(this.draggingObject){
-
-                    this.draggingObject.x =
-                    pointer.worldX;
-
-                    this.draggingObject.y =
-                    pointer.worldY;
-
-                }
-
-            }
-        );
-
-
-        this.input.on(
-            "pointerup",
-            pointer=>{
-
-                if(!this.draggingObject)
-                    return;
-
-
-                this.placeObject(
-                    pointer.worldX,
-                    pointer.worldY
-                );
-
-
-                this.draggingObject.destroy();
-
-                this.draggingObject=null;
-
+                console.log(this.level());
             }
         );
 
@@ -225,112 +123,102 @@ export default class IlumScene extends Phaser.Scene {
 
     createMenu(){
 
-        let y=140;
-        const x=120;
+        let y=120;
 
 
-        this.add.text(
-            x,
-            80,
-            "ELEMENTS",
-            {
-                fontSize:"32px",
-                color:"#ffffff"
-            }
-        )
-        .setOrigin(0.5)
-        .setScrollFactor(0);
+        Object.entries(this.items)
+        .forEach(([key,item])=>{
+
+            const box=this.add.rectangle(
+                120,
+                y,
+                220,
+                70,
+                0x333333
+            )
+            .setInteractive()
+            .setScrollFactor(0);
 
 
-        Object.entries(this.items).forEach(
-            ([key,item])=>{
-
-                const box =
-                this.add.rectangle(
-                    x,
-                    y,
-                    220,
-                    70,
-                    0x333333
-                )
-                .setInteractive()
-                .setScrollFactor(0);
+            this.add.image(
+                65,
+                y,
+                item.texture
+            )
+            .setDisplaySize(
+                45,
+                45
+            )
+            .setScrollFactor(0);
 
 
-                this.add.image(
-                    x-70,
-                    y,
-                    item.texture
-                )
-                .setDisplaySize(
-                    45,
-                    45
-                )
-                .setScrollFactor(0);
+            this.add.text(
+                100,
+                y-18,
+                item.name,
+                {
+                    fontSize:"20px",
+                    color:"#ffffff"
+                }
+            )
+            .setScrollFactor(0);
 
 
-                this.add.text(
-                    x-35,
-                    y-15,
-                    item.name,
-                    {
-                        fontSize:"18px",
-                        color:"#ffffff"
-                    }
-                )
-                .setScrollFactor(0);
+            this.add.text(
+                100,
+                y+10,
+                "⚡ "+item.price,
+                {
+                    fontSize:"16px",
+                    color:"#ffff00"
+                }
+            )
+            .setScrollFactor(0);
 
 
-                this.add.text(
-                    x-35,
-                    y+10,
-                    "⚡ "+item.price,
-                    {
-                        fontSize:"16px",
-                        color:"#ffff00"
-                    }
-                )
-                .setScrollFactor(0);
+            box.on(
+                "pointerdown",
+                ()=>{
+                    this.selected=key;
+                }
+            );
 
 
-                box.on(
-                    "pointerdown",
-                    ()=>{
-                        this.startDrag(key);
-                    }
-                );
+            y+=90;
 
-
-                y+=85;
-
-            }
-        );
+        });
 
     }
 
 
-    startDrag(type){
+    createInput(){
 
-        const item =
-        this.items[type];
-
-
-        if(this.energy < item.price)
-            return;
+        this.input.on(
+            "pointerdown",
+            pointer=>{
 
 
-        this.draggingType=type;
+                if(pointer.rightButtonDown()){
+
+                    this.removeObject(
+                        pointer.worldX,
+                        pointer.worldY
+                    );
+
+                    return;
+                }
 
 
-        this.draggingObject =
-        this.add.image(
-            this.input.x,
-            this.input.y,
-            item.texture
-        )
-        .setDisplaySize(
-            32,
-            32
+                if(!this.selected)
+                    return;
+
+
+                this.placeObject(
+                    pointer.worldX,
+                    pointer.worldY
+                );
+
+            }
         );
 
     }
@@ -338,13 +226,11 @@ export default class IlumScene extends Phaser.Scene {
 
     placeObject(x,y){
 
-        const gx =
-        Math.floor(
+        const gx=Math.floor(
             (x-this.mapX)/this.cellSize
         );
 
-        const gy =
-        Math.floor(
+        const gy=Math.floor(
             (y-this.mapY)/this.cellSize
         );
 
@@ -362,11 +248,23 @@ export default class IlumScene extends Phaser.Scene {
             return;
 
 
-        const item =
-        this.items[this.draggingType];
+        if(
+            this.selected==="exit" &&
+            this.objects.some(
+                o=>o.type==="exit"
+            )
+        )
+            return;
 
 
-        this.energy -= item.price;
+        const item=this.items[this.selected];
+
+
+        if(this.energy < item.price)
+            return;
+
+
+        this.energy-=item.price;
 
 
         this.energyText.setText(
@@ -374,30 +272,28 @@ export default class IlumScene extends Phaser.Scene {
         );
 
 
-        const image =
-        this.add.image(
+        const sprite=this.add.image(
             this.mapX+gx*this.cellSize+16,
             this.mapY+gy*this.cellSize+16,
             item.texture
         )
         .setDisplaySize(
-            32,
-            32
+            this.cellSize,
+            this.cellSize
         );
 
 
         this.grid[gx][gy]={
-            type:this.draggingType,
+            type:this.selected,
             price:item.price,
-            blocked:item.blocked,
-            image:image
+            sprite
         };
 
 
         this.objects.push({
+            type:this.selected,
             x:gx,
-            y:gy,
-            type:this.draggingType
+            y:gy
         });
 
     }
@@ -405,26 +301,23 @@ export default class IlumScene extends Phaser.Scene {
 
     removeObject(x,y){
 
-        const gx =
-        Math.floor(
+        const gx=Math.floor(
             (x-this.mapX)/this.cellSize
         );
 
-        const gy =
-        Math.floor(
+        const gy=Math.floor(
             (y-this.mapY)/this.cellSize
         );
 
 
-        const object =
-        this.grid[gx]?.[gy];
+        const object=this.grid[gx]?.[gy];
 
 
         if(!object)
             return;
 
 
-        this.energy += object.price;
+        this.energy+=object.price;
 
 
         this.energyText.setText(
@@ -432,44 +325,49 @@ export default class IlumScene extends Phaser.Scene {
         );
 
 
-        object.image.destroy();
+        object.sprite.destroy();
 
 
         this.grid[gx][gy]=null;
 
 
-        this.objects =
-        this.objects.filter(
-            o=>!(o.x===gx && o.y===gy)
+        this.objects=this.objects.filter(
+            o=>!(
+                o.x===gx &&
+                o.y===gy
+            )
         );
 
     }
 
 
-    isBlocked(x,y){
+    level(){
 
-        return !!this.grid[x]?.[y]?.blocked;
+        return {
+            width:this.gridSize,
+            height:this.gridSize,
+            energy:this.energy,
+            objects:this.objects
+        };
 
     }
 
 
     createCamera(){
 
-        this.cameras.main.setZoom(0.35);
+        this.cameras.main.setZoom(0.5);
 
 
         this.input.on(
             "wheel",
             (pointer,objects,dx,dy)=>{
 
-                let zoom =
-                this.cameras.main.zoom-dy*0.001;
+                let zoom=this.cameras.main.zoom-dy*0.001;
 
 
-                zoom =
-                Phaser.Math.Clamp(
+                zoom=Phaser.Math.Clamp(
                     zoom,
-                    0.2,
+                    0.25,
                     1
                 );
 

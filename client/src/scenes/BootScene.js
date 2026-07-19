@@ -1,3 +1,5 @@
+import Phaser from "phaser";
+
 import SAMOYED_1 from "../../assets/sprites/avatars/SAMOYED_1.png";
 import SAMOYED_2 from "../../assets/sprites/avatars/SAMOYED_2.png";
 import SAMOYED_3 from "../../assets/sprites/avatars/SAMOYED_3.png";
@@ -6,15 +8,12 @@ import SAMOYED_5 from "../../assets/sprites/avatars/SAMOYED_5.png";
 import SAMOYED_6 from "../../assets/sprites/avatars/SAMOYED_6.png";
 import SAMOYED_7 from "../../assets/sprites/avatars/SAMOYED_7.png";
 
-import wall from "../../assets/images/ilum/wall.png";
-import enemy from "../../assets/images/ilum/Ennemy.png";
 import ground from "../../assets/images/ilum/Ground.png";
-import latexPit from "../../assets/images/ilum/LatexPit.png";
-import squeakIlum from "../../assets/images/ilum/SqueakIlum.png";
-import gliderUp from "../../assets/images/ilum/GliderUp.png";
-import gliderDown from "../../assets/images/ilum/GliderDown.png";
-import gliderLeft from "../../assets/images/ilum/GliderLeft.png";
-import gliderRight from "../../assets/images/ilum/GliderRight.png";
+import groundGrid from "../../assets/images/ilum/GroundGrid.png";
+import shelf from "../../assets/images/ilum/Shelf.png";
+import shelfGrid from "../../assets/images/ilum/ShelfGrid.png";
+import exit from "../../assets/images/ilum/Exit.png";
+import exitGrid from "../../assets/images/ilum/ExitGrid.png";
 
 import player from "../../assets/images/employee/player.png";
 import playerCorrupted from "../../assets/images/employee/PlayerCorrupted.png";
@@ -27,7 +26,7 @@ export default class BootScene extends Phaser.Scene {
 
     preload(){
 
-        const avatars = {
+        const avatars={
             SAMOYED_1,
             SAMOYED_2,
             SAMOYED_3,
@@ -37,37 +36,27 @@ export default class BootScene extends Phaser.Scene {
             SAMOYED_7
         };
 
-        Object.entries(avatars).forEach(
-            ([key,value])=>{
-                this.load.image(key,value);
-            }
-        );
+        Object.entries(avatars).forEach(([key,value])=>{
+            this.load.image(key,value);
+        });
 
-
-        const assets = {
-            wall,
-            enemy,
+        const assets={
             ground,
-            latexPit,
-            squeakIlum,
-            gliderUp,
-            gliderDown,
-            gliderLeft,
-            gliderRight,
+            groundGrid,
+            shelf,
+            shelfGrid,
+            exit,
+            exitGrid,
             player,
             playerCorrupted
         };
 
-        Object.entries(assets).forEach(
-            ([key,value])=>{
-                this.load.image(key,value);
-            }
-        );
-
+        Object.entries(assets).forEach(([key,value])=>{
+            this.load.image(key,value);
+        });
     }
 
     create(){
         this.scene.start("MenuScene");
     }
-
 }
